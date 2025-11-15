@@ -1,171 +1,365 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
-    <meta charset="UTF-g">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Horizontal Timeline of the Crusades</title>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --font-body: 'Inter', sans-serif;
-            --font-theme: 'Cinzel', serif;
-        }
-
         body {
-            font-family: var(--font-body);
-            background-color: #0f172a;
-            background-image: url('https://blogs.thegospelcoalition.org/kevindeyoung/files/2015/02/crusades.jpg');
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* slate-900 */
+            background-image: url('https://i.postimg.cc/W143cJXv/banner.png');
             background-size: cover;
             background-attachment: fixed;
             background-position: center;
-            color: #f1f5f9;
+            color: #f1f5f9; /* slate-100 */
         }
 
         .overlay {
-            background-color: rgba(50, 10, 10, 0.95);
+            background-color: rgba(15, 23, 42, 0.9); /* Heavy slate-900 overlay */
             min-height: 100vh;
             padding: 2rem 0;
         }
 
-        h1, h2, h3 {
-            font-family: var(--font-theme);
+        .font-cinzel {
+            font-family: 'Cinzel', serif;
         }
 
-        .horizontal-timeline-container {
+        /* --- Header & Era Styles --- */
+        .header-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .banner-image {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 1.5rem auto;
+            border-radius: 8px;
+            border: 1px solid #334155; /* slate-700 */
+        }
+        
+        .main-era-timeline {
             display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            padding-bottom: 2rem;
+            justify-content: center; /* Center the era cards */
+            flex-wrap: nowrap; /* Prevent wrapping */
+            gap: 1.5rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            overflow-x: auto; /* Allow horizontal scroll for eras */
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
-            scrollbar-color: #64748b #334155;
+            scrollbar-color: #475569 #1e293b;
         }
-
-        /* This centers the top-level Era container */
-        .era-container {
-            justify-content: center;
+        
+        .main-era-timeline::-webkit-scrollbar {
+            height: 10px;
         }
-
-        .horizontal-timeline-container::-webkit-scrollbar {
-            height: 14px; /* Increased from 10px */
-        }
-        .horizontal-timeline-container::-webkit-scrollbar-track {
-            background: #334155;
+        .main-era-timeline::-webkit-scrollbar-track {
+            background: #1e293b;
             border-radius: 5px;
         }
-        .horizontal-timeline-container::-webkit-scrollbar-thumb {
-            background-color: #64748b;
+        .main-era-timeline::-webkit-scrollbar-thumb {
+            background-color: #475569;
             border-radius: 5px;
-            border: 3px solid #334155; /* Increased from 2px */
+            border: 2px solid #1e293b;
         }
 
-        .timeline-card, .era-card {
-            flex: 0 0 320px;
-            scroll-snap-align: center;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            margin: 1rem;
-            /* padding: 1.5rem; */ /* Padding removed for era card image */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-            position: relative;
-            border: 1px solid #334155;
-        }
-
-        .timeline-card {
-            background-color: #1e293b;
-            padding: 1.5rem; /* Add padding back to timeline cards */
-        }
 
         .era-card {
-            background-color: #334155;
-            /* justify-content: center; */ /* Removed */
-            /* text-align: center; */ /* Removed */
-            padding: 0; /* Padding removed for flush image */
+            flex: 0 0 320px; /* Fixed width for each card */
+            background-color: #1e293b; /* slate-800 */
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            border: 1px solid #334155; /* slate-700 */
             cursor: pointer;
+            text-align: center;
+        }
+        
+        .era-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border-color: #be123c; /* rose-700 */
+        }
+        
+        .era-card.active {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(190, 18, 60, 0.5);
+            border-color: #be123c; /* rose-700 */
+        }
+        
+        .era-image {
+            width: 100%;
+            height: 144px; /* 9rem */
+            object-fit: contain; /* Changed from 'cover' to 'contain' */
+            border-radius: 8px;
+            margin-bottom: 1rem;
         }
         
         .era-title {
-            font-family: var(--font-theme);
-            font-size: 1.75rem;
-            color: #ef4444;
-        }
-        
-        .era-subtitle {
-            font-family: var(--font-body);
-            font-size: 1rem;
-            color: #cbd5e1;
-            font-style: italic;
-            margin-top: 0.5rem;
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 700;
+            color: #f1f5f9; /* slate-100 */
+            margin-bottom: 0.5rem;
         }
 
-        .timeline-card:hover, .era-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        .era-date {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #be123c; /* rose-700 */
+            margin-bottom: 0.75rem;
         }
         
-        /* Style for the selected Era card */
-        .era-card.selected {
-            border-color: #ef4444; /* red-500 */
-            box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
+        .era-description {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #94a3b8; /* slate-400 */
+        }
+
+        /* --- Sub-Timeline Styles --- */
+        .sub-timeline-container {
+            display: none; /* Hidden by default */
+            width: 100%;
+            position: relative; /* For arrow positioning */
+        }
+        
+        .horizontal-timeline-scroll {
+            display: flex;
+            overflow-x: auto; /* Enable horizontal scrolling */
+            scroll-snap-type: x mandatory;
+            padding-bottom: 2rem;
+            -webkit-overflow-scrolling: touch; /* Smoother scrolling on iOS */
+            scrollbar-width: thin; /* Firefox */
+            scrollbar-color: #475569 #1e293b; /* Thumb and Track */
+            scroll-behavior: smooth; /* For button scrolling */
+        }
+        
+        /* Custom Scrollbar for Webkit browsers */
+        .horizontal-timeline-scroll::-webkit-scrollbar {
+            height: 14px;
+        }
+        .horizontal-timeline-scroll::-webkit-scrollbar-track {
+            background: #1e293b; /* slate-800 */
+            border-radius: 7px;
+        }
+        .horizontal-timeline-scroll::-webkit-scrollbar-thumb {
+            background-color: #475569; /* slate-600 */
+            border-radius: 7px;
+            border: 3px solid #1e293b;
+        }
+        .horizontal-timeline-scroll::-webkit-scrollbar-thumb:hover {
+            background-color: #64748b; /* slate-500 */
+        }
+
+        .timeline-card {
+            flex: 0 0 300px; /* Fixed width for each card */
+            scroll-snap-align: center;
+            background-color: #1e293b; /* slate-800 */
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            margin: 1rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            border: 1px solid #334155; /* slate-700 */
+        }
+
+        .timeline-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
         }
 
         .card-image {
             width: 100%;
-            height: 180px;
+            height: 180px; /* Fixed height for images */
             object-fit: cover;
             border-radius: 8px;
             margin-bottom: 1rem;
             border: 1px solid #334155;
-        }
-        
-        .era-card-image {
-            width: 100%;
-            height: 144px; /* h-36 */
-            object-fit: contain; /* Changed from 'cover' to 'contain' */
-            border-radius: 11px 11px 0 0; /* rounded-t-lg (12px) minus border (1px) */
+            background-color: #0f172a;
         }
 
         .card-date {
             font-size: 0.95rem;
             font-weight: 600;
-            color: #ef4444;
+            color: #be123c; /* rose-700 */
             margin-bottom: 0.5rem;
         }
 
         .card-title {
-            font-family: var(--font-theme);
-            font-size: 1.25rem;
+            font-size: 1.25rem; /* text-xl */
             font-weight: 700;
-            color: #f1f5f9;
+            color: #f1f5f9; /* slate-100 */
             margin-bottom: 0.75rem;
         }
 
         .card-description {
-            font-family: var(--font-body);
             font-size: 0.9rem;
             line-height: 1.5;
-            color: #cbd5e1;
-            flex-grow: 1;
+            color: #94a3b8; /* slate-400 */
+            flex-grow: 1; /* Allows description to take up available space */
             margin-bottom: 1rem;
         }
 
-        /* Modal styles */
-        #gemini-modal.hidden {
+        /* --- Scroll Arrow Buttons --- */
+        .scroll-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            background-color: rgba(30, 41, 59, 0.8); /* slate-800 with opacity */
+            color: #f1f5f9; /* slate-100 */
+            border: 1px solid #475569; /* slate-600 */
+            border-radius: 9999px; /* full */
+            width: 3rem; /* 48px */
+            height: 3rem; /* 48px */
+            font-size: 1.5rem; /* 24px */
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .scroll-arrow:hover {
+            background-color: #be123c; /* rose-700 */
+            color: white;
+            border-color: #be123c;
+        }
+        .scroll-arrow.left {
+            left: -10px;
+        }
+        .scroll-arrow.right {
+            right: -10px;
+        }
+        @media (max-width: 640px) {
+            .scroll-arrow {
+                width: 2.5rem;
+                height: 2.5rem;
+                font-size: 1rem;
+            }
+            .scroll-arrow.left { left: 2px; }
+            .scroll-arrow.right { right: 2px; }
+        }
+
+        /* --- Modal styles --- */
+        #details-modal.hidden {
             display: none;
         }
-        #modal-title {
-            font-family: var(--font-theme);
+        #details-modal {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 50;
         }
-        #modal-response {
-            font-family: var(--font-body);
+        .modal-container {
+            background-color: #1e293b; /* slate-800 */
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 3xl; /* 768px */
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #334155; /* slate-700 */
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #334155; /* slate-700 */
+        }
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #f1f5f9; /* slate-100 */
+        }
+        .modal-close-btn {
+            color: #94a3b8; /* slate-400 */
+            transition: color 0.2s;
+        }
+        .modal-close-btn:hover {
+            color: white;
+        }
+        .modal-content {
+            padding: 1.5rem;
+            overflow-y: auto;
+            color: #cbd5e1; /* slate-300 */
+            /* Tailwind prose styles adapted for dark mode */
+            line-height: 1.6;
+        }
+        .modal-content h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #be123c; /* rose-700 */
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid #334155;
+        }
+        .modal-content p {
+            margin-bottom: 1rem;
+        }
+        .modal-content blockquote {
+            border-left: 4px solid #475569; /* slate-600 */
+            padding-left: 1rem;
+            font-style: italic;
+            color: #94a3b8; /* slate-400 */
+            margin-left: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* FIX: Hide the modal data container by default */
+        .modal-data {
+            display: none;
+        }
+        
+        /* NEW: Audio Player Styles */
+        #modal-audio-player {
+            width: 100%;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Hide audio player by default */
+        #modal-audio-player[src=""] {
+            display: none;
+        }
+        
+        /* Style the audio player */
+        audio::-webkit-media-controls-panel {
+            background-color: #334155; /* slate-700 */
+        }
+        audio::-webkit-media-controls-play-button,
+        audio::-webkit-media-controls-mute-button {
+            color: #f1f5f9;
+            background-color: #be123c;
+            border-radius: 50%;
+        }
+        audio::-webkit-media-controls-timeline,
+        audio::-webkit-media-controls-volume-slider {
+            background-color: #475569; /* slate-600 */
+            border-radius: 2px;
+        }
+        audio::-webkit-media-controls-current-time-display,
+        audio::-webkit-media-controls-time-remaining-display {
+            color: #f1f5f9;
         }
 
     </style>
@@ -173,589 +367,668 @@
 <body class="h-full">
 
     <div class="overlay">
-        <div class="container mx-auto px-4 py-12">
+        <div class="container mx-auto px-4 py-8 md:py-12">
             
-            <!-- Centered Header Block -->
-            <div class="flex flex-col items-center">
-                <div class="flex justify-center mb-6">
-                    <img src="https://i.postimg.cc/W143cJXv/banner.png" 
-                         alt="Project Header Image" 
-                         class="max-w-full h-auto rounded-lg"
-                         onerror="this.src='https://placehold.co/600x150/1e293b/f1f5f9?text=Image+Missing'; this.onerror=null;">
-                </div>
-    
-                <h1 class="text-4xl md:text-5xl font-bold text-center text-slate-100 mb-4">
+            <!-- Header -->
+            <div class="header-container">
+                <img src="https://i.postimg.cc/W143cJXv/banner.png" alt="Timeline Banner" class="banner-image">
+                <h1 class="text-4xl md:text-5xl font-bold text-center font-cinzel text-white mb-4">
                     Horizontal Timeline of the Crusades
                 </h1>
-                <p class="text-center text-lg text-slate-300 mb-16 max-w-2xl mx-auto">
-                    Explore the major military campaigns, figures, and events of the Crusades. Click an era to explore its events.
+                <p class="text-center text-lg text-slate-400 mb-10 max-w-2xl mx-auto">
+                    Explore the major military campaigns, figures, and events of the Crusades.
+                    Click an era to explore its events.
                 </p>
             </div>
-            
 
-<!-- Main Era Timeline -->
-<div id="era-timeline" class="horizontal-timeline-container era-container">
-
-                <!-- ERA 1 CARD -->
-                <div class="era-card" data-era="era1" data-title="Prelude to a Clash of Gods (1071-1187)">
-                    <img src="https://i.postimg.cc/c4Bm5P5F/jerusalem-cross-medieval-knights-cross-crusader-beltschazar-transparent.png" alt="Prelude" class="era-card-image" onerror="this.src='https://placehold.co/320x150/334155/ef4444?text=Image+Error'; this.onerror=null;">
-                    <div class="p-6 text-center">
-                        <h2 class="era-title">Prelude to a Clash of Gods</h2>
-                        <h3 class="era-subtitle">(1071-1187)</h3>
-                        <p class="card-description mt-4 mb-0">The geopolitical fractures and the inciting incidents that launched the conflict.</p>
-                    </div>
+            <!-- Main Era Timeline -->
+            <div class="main-era-timeline">
+                <!-- Era 1 -->
+                <div class="era-card" data-era="era1">
+                    <img src="https://i.postimg.cc/c4Bm5P5F/jerusalem-cross-medieval-knights-cross-crusader-beltschazar-transparent.png" alt="Jerusalem Cross" class="era-image">
+                    <h2 class="era-title font-cinzel">Prelude to a Clash of Gods</h2>
+                    <div class="era-date">(1071-1187)</div>
+                    <p class="era-description">The geopolitical fractures and the inciting incidents that launched the conflict.</p>
                 </div>
-                
-                <!-- ERA 2 CARD -->
-                <div class="era-card" data-era="era2" data-title="The Theology of Aggression (1189-1260)">
-                    <img src="https://i.postimg.cc/c4Bm5P5F/jerusalem-cross-medieval-knights-cross-crusader-beltschazar-transparent.png" alt="Theology of Aggression" class="era-card-image" onerror="this.src='https://placehold.co/320x150/334155/ef4444?text=Image+Error'; this.onerror=null;">
-                    <div class="p-6 text-center">
-                        <h2 class="era-title">The Theology of Aggression</h2>
-                        <h3 class="era-subtitle">(1189-1260)</h3>
-                        <p class="card-description mt-4 mb-0">The escalation of violence, the internal decay of the Crusading movement, and the rise of new powers.</p>
-                    </div>
+                <!-- Era 2 -->
+                <div class="era-card" data-era="era2">
+                    <img src="https://i.postimg.cc/c4Bm5P5F/jerusalem-cross-medieval-knights-cross-crusader-beltschazar-transparent.png" alt="Jerusalem Cross" class="era-image">
+                    <h2 class="era-title font-cinzel">The Theology of Aggression</h2>
+                    <div class="era-date">(1189-1260)</div>
+                    <p class="era-description">The escalation of violence, the internal decay of the Crusading movement, and the rise of new states.</p>
                 </div>
-
-                <!-- ERA 3 CARD -->
-                <div class="era-card" data-era="era3" data-title="The Lasting Stains of Blood (1291-1498)">
-                    <img src="https://i.postimg.cc/c4Bm5P5F/jerusalem-cross-medieval-knights-cross-crusader-beltschazar-transparent.png" alt="Lasting Stains" class="era-card-image" onerror="this.src='https://placehold.co/320x150/334155/ef4444?text=Image+Error'; this.onerror=null;">
-                    <div class="p-6 text-center">
-                        <h2 class="era-title">The Lasting Stains of Blood</h2>
-                        <h3 class="era-subtitle">(1291-1498)</h3>
-                        <p class="card-description mt-4 mb-0">The long-term consequences, the rise of new empires from the ashes, and the shift in global power.</p>
-                    </div>
+                <!-- Era 3 -->
+                <div class="era-card" data-era="era3">
+                    <img src="https://i.postimg.cc/c4Bm5P5F/jerusalem-cross-medieval-knights-cross-crusader-beltschazar-transparent.png" alt="Jerusalem Cross" class="era-image">
+                    <h2 class="era-title font-cinzel">The Lasting Stains of Blood</h2>
+                    <div class="era-date">(1291-1498)</div>
+                    <p class="era-description">The long-term consequences, the rise of new empires, and the shift in global power.</p>
                 </div>
-</div>
-
-<!-- Sub-Timeline Container (starts hidden) -->
-<div id="sub-timeline" class="mt-12 hidden relative"> <!-- Added relative positioning -->
-    <h3 id="sub-timeline-title" class="text-3xl font-bold text-red-500 mb-4 ml-4"></h3>
-    
-    <!-- Scroll Buttons -->
-    <button id="scroll-left-btn" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-slate-800 bg-opacity-70 hover:bg-opacity-100 p-2 rounded-full text-white transition-all" style="transform: translate(-50%, -50%); left: 2rem;">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-    </button>
-    <button id="scroll-right-btn" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-slate-800 bg-opacity-70 hover:bg-opacity-100 p-2 rounded-full text-white transition-all" style="transform: translate(50%, -50%); right: 2rem;">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-    </button>
-
-    <div id="sub-timeline-events" class="horizontal-timeline-container">
-        <!-- Event cards will be injected here by JavaScript -->
-    </div>
-</div>
-
-
-<!-- =================================================================== -->
-<!-- EVENT DATA STORE (HIDDEN) -->
-<!-- All timeline cards are stored here and copied into the sub-timeline -->
-<!-- =================================================================== -->
-<div id="event-data-store" class="hidden">
-
-    <!-- ERA 1 EVENTS -->
-    <div data-era-group="era1">
-        <!-- 1. Battle of Manzikert -->
-        <div class="timeline-card">
-            <img src="https://i.postimg.cc/DZfFL9Dt/1706475713-333-Byzantine-defeat-at-Manzikert.webp" alt="Battle of Manzikert" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
-            <div class="card-date">1071 CE</div>
-            <div class="card-title">The Battle of Manzikert</div>
-            <div class="card-description">
-                The Seljuk Sultan Alp Arslan decimated the Byzantine army, capturing Emperor Romanus Diogenes. This "seminal catastrophe" shattered Byzantine power in Anatolia, opening the region to Turkish migration and eventually compelling Emperor Alexios I to appeal to Rome for aid—the direct catalyst for the First Crusade.
-            </div>
-            <div class="mt-auto flex gap-2 flex-wrap">
-                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
-                    Read More / Source
-                </button>
-            </div>
-            <div class="modal-data hidden">
-                <div class="modal-more-info">
-                    <p>[Additional 1-2 paragraphs for Clermont go here.]</p>
-                </div>
-                <div class="modal-primary-source mt-6">
-                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
-                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
-                        "[Primary source quote for Clermont goes here.]"
-                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
-                    </blockquote>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. Conquest of Jerusalem -->
-        <div class="timeline-card">
-            <img src="https://i.postimg.cc/N05ZtQ38/The-capture-of-Jersalem.jpg" alt="The Conquest of Jerusalem" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
-            <div class="card-date">1099 CE</div>
-            <div class="card-title">The Conquest of Jerusalem</div>
-            <div class="card-description">
-                The bloody climax of the First Crusade saw European forces breach the walls of Jerusalem, massacring its Muslim and Jewish inhabitants. This victory established the Latin Kingdom of Jerusalem and marked the high-water mark of Crusader success, planting a European colony in the heart of the Levant.
-            </div>
-            <div class="mt-auto flex gap-2 flex-wrap">
-                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
-                    Read More / Source
-                </button>
-            </div>
-            <div class="modal-data hidden">
-                <div class="modal-more-info">
-                    <p>[Additional 1-2 paragraphs for Jerusalem go here.]</p>
-                </div>
-                <div class="modal-primary-source mt-6">
-                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
-                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
-                        "[Primary source quote for Jerusalem goes here.]"
-                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
-                    </blockquote>
-                </div>
-            </div>
-        </div>
-
-        <!-- 4. Fall of Edessa -->
-        <div class="timeline-card">
-            <img src="https://i.postimg.cc/vTqWGdFT/the-fall-of-edessa.jpg" alt="Fall of Edessa" class="card-image" onerror="this.src='https://placehold.co/400x300/1e2 ubiqub/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
-            <div class="card-date">1144 CE</div>
-            <div class="card-title">The Fall of Edessa</div>
-            <div class="card-description">
-                Zangi, the Turkish atabeg of Mosul, captured Edessa, the first of the Crusader states to fall. This reversal shocked Europe, triggering the Second Crusade and signaling the beginning of a unified Muslim counter-response.
-            </div>
-            <div class="mt-auto flex gap-2 flex-wrap">
-                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
-                    Read More / Source
-                </button>
-            </div>
-            <div class="modal-data hidden">
-                <div class="modal-more-info">
-                    <p>[Additional 1-2 paragraphs for Edessa go here.]</p>
-                </div>
-                <div class="modal-primary-source mt-6">
-                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
-                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
-                        "[Primary source quote for Edessa goes here.]"
-                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
-                    </blockquote>
-                </div>
-            </div>
-        </div>
-
-        <!-- 5. Battle of Hattin -->
-        <div class="timeline-card">
-            <img src="https://i.postimg.cc/sgvJDmcr/Horns-of-Hattin-1.jpg" alt="Battle of Hattin" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
-            <div class="card-date">1187 CE</div>
-            <div class="card-title">The Battle of Hattin</div>
-            <div class="card-description">
-                Saladin (Salah al-Din) lured the Crusader army into a waterless trap near the Horns of Hattin, destroying their forces and capturing the King of Jerusalem. This decisive victory enabled Saladin to retake Jerusalem, effectively ending the First Crusade and shifting the balance of power permanently back in favor of the Muslims.
-            </div>
-            <div class="mt-auto flex gap-2 flex-wrap">
-                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
-                    Read More / Source
-                </button>
-            </div>
-            <div class="modal-data hidden">
-                <div class="modal-more-info">
-                    <p>[Additional 1-2 paragraphs for Hattin go here.]</p>
-                </div>
-                <div class="modal-primary-source mt-6">
-                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
-                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
-                        "[Primary source quote for Hattin goes here.]"
-                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
-                    </blockquote>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- ERA 2 EVENTS -->
-    <div data-era-group="era2">
-        <!-- 6. The Third Crusade -->
-        <div class="timeline-card">
-            <img src="https://i.postimg.cc/QxWt8W7D/048c3cd42d27d3bf266c7a8419cbae42.webp" alt="The Third Crusade" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
-            <div class="card-date">1189-1192 CE</div>
-            <div class="card-title">The Third Crusade</div>
-            <div class="card-description">
-                Known as the "King's Crusade," this campaign pitted Richard the Lionheart against Saladin. Despite military successes for the Crusaders, they failed to retake Jerusalem, ending in a truce that allowed unarmed Christian pilgrims access to the city but left it in Muslim hands.
-            </div>
-            <div class="mt-auto flex gap-2 flex-wrap">
-                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
-                    Read More / Source
-                </button>
-            </div>
-            <div class="modal-data hidden">
-                <div class="modal-more-info">
-                    <p>[Additional 1-2 paragraphs for the Third Crusade go here.]</p>
-                </div>
-                <div class="modal-primary-source mt-6">
-                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
-                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
-                        "[Primary source quote for the Third Crusade goes here.]"
-                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
-                    </blockquote>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 7. Sack of Constantinople -->
-        <div class="timeline-card">
-            <img src="https://i.postimg.cc/L64p7F85/Sack-of-Constantinople.png" alt="The Sack of Constantinople" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
-            <div class="card-date">1204 CE</div>
-            <div class="card-title">The Sack of Constantinople</div>
-            <div class="card-description">
-                In a shocking turn, the Fourth Crusade diverted from the Holy Land to sack the Christian city of Constantinople. This betrayal fatally weakened the Byzantine Empire, widened the schism between Catholic and Orthodox churches, and exposed the movement's shift from piety to plunder.
-            </div>
-            <div class="mt-auto flex gap-2 flex-wrap">
-                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
-                    Read More / Source
-                </button>
-            </div>
-            <div class="modal-data hidden">
-                <div class="modal-more-info">
-                    <p>[Additional 1-2 paragraphs for Constantinople go here.]</p>
-                </div>
-                <div class="modal-primary-source mt-6">
-                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
-                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
-                        "[Primary source quote for Constantinople goes here.]"
-                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
-                    </blockquote>
-                </div>
-            </div>
-        </div>
-
-        <!-- 8. Treaty of Jaffa -->
-        <div class="timeline-card">
-            <img src="https://i.postimg.cc/x8T4sY3G/463061.jpg" alt="The Treaty of Jaffa" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
-            <div class="card-date">1229 CE</div>
-            <div class="card-title">The Treaty of Jaffa</div>
-            <div class="card-description">
-                Holy Roman Emperor Frederick II regained control of Jerusalem not through war, but through a diplomatic treaty with the Ayyubid Sultan al-Kamil. This decade-long truce demonstrated that pragmatism could occasionally prevail over religious zealotry, although it was condemned by the Pope.
-            </div>
-            <div class="mt-auto flex gap-2 flex-wrap">
-                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
-                    Read More / Source
-                </button>
-            </div>
-            <div class="modal-data hidden">
-                <div class="modal-more-info">
-                    <p>[Additional 1-2 paragraphs for Jaffa go here.]</p>
-                </div>
-                <div class="modal-primary-source mt-6">
-                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
-                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
-                        "[Primary source quote for Jaffa goes here.]"
-                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
-                    </blockquote>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 9. The Seventh Crusade -->
-        <div class="timeline-card">
-            <img src="https://i.postimg.cc/J4sTtpTp/the-seventh-crusade.jpg" alt="The Seventh Crusade" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
-            <div class="card-date">1249-1250</div>
-            <div class="card-title">The Seventh Crusade</div>
-            <div class="card-description">
-                King Louis IX's invasion of Egypt aimed to decapitate Ayyubid power but ended in his capture at Al-Mansurah. This disaster catalyzed the rise of the Mamluk Sultanate, shifting the regional power dynamic toward a new, more militarized Muslim leadership that would ultimately doom the Crusader states.
-            </div>
-            <div class="mt-auto flex gap-2 flex-wrap">
-                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
-                    Read More / Source
-                </button>
-            </div>
-            <div class="modal-data hidden">
-                <div class="modal-more-info">
-                    <p>[Additional 1-2 paragraphs for the Seventh Crusade go here.]</p>
-G                </div>
-                <div class="modal-primary-source mt-6">
-                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
-                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
-                        "[Primary source quote for the Seventh Crusade goes here.]"
-                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
-                    </blockquote>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 10. Battle of Ayn Jalut -->
-        <div class="timeline-card">
-            <img src="https://i.postimg.cc/tTm3jjHN/jalut.webp" alt="Battle of Ayn Jalut" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
-            <div class="card-date">1260 CE</div>
-            <div class="card-title">The Battle of Ayn Jalut</div>
-            <div class="card-description">
-                The Mamluk Sultanate of Egypt defeated the Mongol army in Galilee, marking the first major defeat for the Mongols in the region. This victory halted their westward expansion, preserved Egypt as a Muslim power, and positioned the Mamluks as the new defenders of the faith.
-            </div>
-            <div class="mt-auto flex gap-2 flex-wrap">
-                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
-                    Read More / Source
-                </button>
-            </div>
-            <div class="modal-data hidden">
-                <div class="modal-more-info">
-                    <p>[Additional 1-2 paragraphs for Ayn Jalut go here.]</p>
-                </div>
-                <div class="modal-primary-source mt-6">
-                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
-                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
-                        "[Primary source quote for Ayn Jalut goes here.]"
-                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
-                    </blockquote>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ERA 3 EVENTS -->
-    <div data-era-group="era3">
-        <!-- 11. Fall of Acre -->
-        <div class="timeline-card">
-            <img src="https://i.postimg.cc/G3VVCBrF/the-Fall-of-acrre.jpg" alt="Fall of Acre" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
-            <div class="card-date">1291 CE</div>
-            <div class="card-title">The Fall of Acre</div>
-            <div class="card-description">
-                The Mamluks stormed Acre, the last major Crusader stronghold, driving the "Franj" into the sea. This marked the definitive end of the European military presence in the Levant, closing the era of the Crusades but leaving behind a militarized and suspicious Islamic world.
-            </div>
-            <div class="mt-auto flex gap-2 flex-wrap">
-                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
-                    Read More / Source
-                </button>
-            </div>
-            <div class="modal-data hidden">
-                <div class="modal-more-info">
-                    <p>[Additional 1-2 paragraphs for Acre go here.]</p>
-                </div>
-                <div class="modal-primary-source mt-6">
-                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
-                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
-                        "[Primary source quote for Acre goes here.]"
-                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
-                    </blockquote>
-                </div>
-            </div>
-        </div>
-
-        <!-- 12. Rise of Osman Ghazi -->
-        <div class="timeline-card">
-            <img src="https://i.postimg.cc/Hkp2DHJV/Kurulus-Osman-1.jpg" alt="Rise of Osman Ghazi" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
-            <div class="card-date">1299 CE</div>
-            <div class="card-title">The Rise of Osman Ghazi</div>
-            <div class="card-description">
-                From the anarchic frontier left by the Crusades and Mongol invasions, Osman Ghazi forged a new state dedicated to ghaza (holy war). This militarized principality would grow into the Ottoman Empire—a direct political response to the power vacuums of the era.
-            </div>
-            <div class="mt-auto flex gap-2 flex-wrap">
-                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
-                    Read More / Source
-                </button>
-            </div>
-            <div class="modal-data hidden">
-                <div class="modal-more-info">
-                    <p>[Additional 1-2 paragraphs for Osman Ghazi go here.]</p>
-                </div>
-                <div class="modal-primary-source mt-6">
-                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
-                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
-                        "[Primary source quote for Osman Ghazi goes here.]"
-                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
-                    </blockquote>
-                </div>
-            </div>
-        </div>
-
-        <!-- 13. Fall of Constantinople -->
-        <div class="timeline-card">
-            <img src="https://i.postimg.cc/yd5Qs5q6/Fall-of-Constatinople.jpg" alt="Fall of Constantinople" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
-            <div class="card-date">1453 CE</div>
-            <div class="card-title">The Fall of Constantinople</div>
-            <div class="card-description">
-                The Ottoman conquest of Constantinople was the final death knell of the Byzantine Empire, which had been fatally weakened centuries earlier by the Fourth Crusade. Mehmed II's victory fulfilled the Islamic dream of toppling the "New Rome," cementing the Ottomans as the new superpower.
-            </div>
-            <div class="mt-auto flex gap-2 flex-wrap">
-                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
-                    Read More / Source
-                </button>
-            </div>
-            <div class="modal-data hidden">
-                <div class="modal-more-info">
-                    <p>[Additional 1-2 paragraphs for the Fall of Constantinople go here.]</p>
-                </div>
-                <div class="modal-primary-source mt-6">
-                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
-                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
-                        "[Primary source quote for the Fall of Constantinople goes here.]"
-                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
-                    </blockquote>
-                </div>
-            </div>
-        </div>
-
-        <!-- 14. Fall of Granada -->
-        <div class="timeline-card">
-            <img src="https://i.postimg.cc/50qyVcQH/the-Fall-of-Grenada.jpg" alt="Fall of Granada" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
-            <div class="card-date">1492 CE</div>
-            <div class="card-title">The Fall of Granada</div>
-            <div class="card-description">
-                In the same year that Columbus sailed, the Catholic Monarchs Ferdinand and Isabella conquered Granada, the last Muslim stronghold on the Iberian Peninsula. This victory marked the violent conclusion of the Reconquista, ending nearly 800 years of Muslim presence in Al-Andalus and consolidating a militant, crusading Catholic Spain that would soon turn its aggression toward the New World.
-            </div>
-            <div class="mt-auto flex gap-2 flex-wrap">
-                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
-                    Read More / Source
-                </button>
-            </div>
-            <div class="modal-data hidden">
-                <div class="modal-more-info">
-                    <p>[Additional 1-2 paragraphs for Granada go here.]</p>
-                </div>
-                <div class="modal-primary-source mt-6">
-                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
-                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
-                        "[Primary source quote for Granada goes here.]"
-                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
-                    </blockquote>
-                </div>
-            </div>
-        </div>
-
-        <!-- 15. Age of Discovery (Vasco da Gama) -->
-        <div class="timeline-card">
-            <img src="https://i.postimg.cc/5Npzzz08/Vasco-de-Gama.webp" alt="Age of Discovery (Vasco da Gama)" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
-            <div class="card-date">1498 CE</div>
-            <div class="card-title">The Age of Discovery (Vasco da Gama)</div>
-            <div class="card-description">
-                Blocked by the hostile "Muslim Lake" of the Ottoman and Mamluk empires—a geopolitical legacy of the Crusades—European powers were compelled to seek alternative sea routes to the East. Vasco da Gama's arrival in India marked the beginning of European colonial imperialism, a direct economic "blowback" from the failure to hold the Holy Land.
-            </div>
-            <div class="mt-auto flex gap-2 flex-wrap">
-                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
-                    Read More / Source
-                </button>
-            </div>
-            <div class="modal-data hidden">
-                <div class="modal-more-info">
-                    <p>[Additional 1-2 paragraphs for Vasco da Gama go here.]</p>
-                </div>
-                <div class="modal-primary-source mt-6">
-                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
-                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
-                        "[Primary source quote for Vasco daGama goes here.]"
-                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
-                    </blockquote>
-                </div>
-            </div>
-        </div>
-    </div> <!-- End Era 3 -->
-
-</div> <!-- End Event Data Store -->
-
-
-</div> <!-- End Overlay -->
-    
-
-<!-- Dark Theme Modal -->
-<div id="gemini-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden transition-opacity duration-300" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="bg-slate-900 rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col border border-slate-700">
-            
-            <div class="flex justify-between items-center p-4 border-b border-slate-700">
-                <h3 id="modal-title" class="text-lg font-semibold text-slate-100">Modal Title</h3>
-                <button id="modal-close-btn" class="text-gray-400 hover:text-gray-100" aria-label="Close modal">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0, 0, 24, 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
             </div>
             
-            <div id="modal-content" class="p-6 overflow-y-auto prose prose-slate prose-invert max-w-none">
-                <!-- Content will be injected here by JS -->
+            <!-- Sub-Timeline Container -->
+            <div id="sub-timeline-container" class="sub-timeline-container">
+                <button class="scroll-arrow left" aria-label="Scroll left">&lt;</button>
+                <div class="horizontal-timeline-scroll">
+                    <!-- ERA 1 EVENTS -->
+                    <div data-era-group="era1">
+                        <!-- 1. Battle of Manzikert -->
+                        <div class="timeline-card">
+                            <img src="https://i.postimg.cc/DZfFL9Dt/1706475713-333-Byzantine-defeat-at-Manzikert.webp" alt="Battle of Manzikert" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+                            <div class="card-date">1071 CE</div>
+                            <div class="card-title">The Battle of Manzikert</div>
+                            <div class="card-description">
+                                The Seljuk Sultan Alp Arslan decimated the Byzantine army, capturing Emperor Romanus Diogenes. This "seminal catastrophe" shattered Byzantine power in Anatolia, opening the region to Turkish migration and eventually compelling Emperor Alexios I to appeal to Rome for aid—the direct catalyst for the First Crusade.
+                            </div>
+                            <div class="mt-auto flex gap-2 flex-wrap">
+                                <button class="text-sm bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-600 transition-colors read-more-btn">
+                                    Read More / Source
+                                </button>
+                            </div>
+                            <!-- Modal Content: Manzikert -->
+                            <div class="modal-data" 
+                                 data-title="The Battle of Manzikert" 
+                                 data-audio-src="https://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/Manzikert1.mp3">
+                                <h3>Significance</h3>
+                                <p>The defeat suffered by the Byzantine forces at the hands of the Seljuk Sultan Alp Arslan led to the capture of Emperor Romanus Diogenes. This 'seminal catastrophe' shattered the Byzantine grip on Anatolia and severely undermined its military and political power, setting the stage for the Crusades.</p>
+                                <p>The aftermath of the battle led to significant Turkish migration, effectively altering the demographic landscape of Anatolia. This influx of Turkish tribes would eventually lead to the establishment of a new order in the region and the gradual decline of Byzantine influence.</p>
+                                <p>Emperor Alexios I Comnenus's dramatic plea for help from the West, particularly from Pope Urban II and the Christian states of Europe, was a transformative moment in the history of the Byzantine Empire. This plea not only altered the political landscape of the empire but also sparked a series of religious conflicts that would significantly shape the course of medieval history.</p>
+                                <h3>Primary Source</h3>
+                                <blockquote>
+                                    "It was like an earthquake with howling, grief, sudden fear, clouds of dust, and, finally, hordes of Turks riding all around us."
+                                    <br>
+                                    <cite class="text-sm not-italic text-slate-400 block mt-2">— Michael Attaleiates, a Byzantine historian and eyewitness in the imperial camp.</cite>
+                                </blockquote>
+                            </div>
+                        </div>
+
+                        <!-- 2. Council of Clermont -->
+                        <div class="timeline-card">
+                            <img src="https://i.postimg.cc/9fWsnGbj/Council-of-Clermont.avif" alt="Council of Clermont" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+                            <div class="card-date">1095 CE</div>
+                            <div class="card-title">The Council of Clermont</div>
+                            <div class="card-description">
+                                Pope Urban II delivered a sermon calling for a holy war to reclaim Jerusalem, promising remission of sins to all who participated. This speech weaponized religious fervor, launching the First Crusade and mobilizing thousands of knights and commoners to march East.
+                            </div>
+                            <div class="mt-auto flex gap-2 flex-wrap">
+                                <button class="text-sm bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-600 transition-colors read-more-btn">
+                                    Read More / Source
+                                </button>
+                            </div>
+                            <!-- Modal Content: Clermont -->
+                            <div class="modal-data" 
+                                 data-title="The Council of Clermont"
+                                 data-audio-src="https://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/Council%20of%20Clermont.mp3">
+                                <h3>Significance</h3>
+                                <p>This pivotal event took place in France following a plea for military aid from Emperor Alexios. It was here that Pope Urban II delivered a compelling sermon that would resonate through history. He called upon Christians to embark on a holy war aimed at reclaiming Jerusalem from Muslim control, citing the city's significance as the birthplace of Christianity and a vital pilgrimage site for believers.</p>
+                                <p>During his impassioned address, Urban II depicted the dire plight of Christians in the East, emphasizing their suffering at the hands of non-Christians and calling for a united Christian front to protect their faith and fellow believers. He promised the remission of sins and eternal salvation to all who would take up arms and join the crusade, thus unlocking a powerful wave of religious sentiment and devotion.</p>
+                                <p>The sermon ignited a fervor among both the nobility and the ordinary people, inspiring thousands-knights, serfs, and families-to abandon their lands and homes. Many were motivated by deep religious conviction, while others sought adventure, wealth, or social status. This mobilization of diverse groups formed the foundation for the First Crusade, leading them on a perilous journey across Europe and the Mediterranean toward the distant goal of Jerusalem.</p>
+                                <p>Urban II's call effectively weaponized the existing religious fervor of the time, transforming it into a political and military movement that sought not only to reclaim sacred territories but to assert Christendom's influence over the Muslim world. The nuances of this moment had far-reaching implications, as it set the stage for centuries of conflict, cultural exchanges, and the shaping of medieval Europe's societal landscape.</p>
+                                <h3>Primary Source</h3>
+                                <blockquote>
+                                    "When an armed attack is made upon the enemy, let all the soldiers of God raise this one cry: It is the will of God! It is the will of God!"
+                                    <br>
+                                    <cite class="text-sm not-italic text-slate-400 block mt-2">— Robert the Monk, a chronicler present at Pope Urban II's speech.</cite>
+                                </blockquote>
+                            </div>
+                        </div>
+
+                        <!-- 3. The First Crusade -->
+                        <div class="timeline-card">
+                            <img src="https://i.postimg.cc/N05ZtQ38/The-capture-of-Jersalem.jpg" alt="Conquest of Jerusalem" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+                            <div class="card-date">1099 CE</div>
+                            <div class="card-title">The First Crusade</div>
+                            <div class="card-description">
+                                The bloody climax of the First Crusade saw European forces breach the walls of Jerusalem, massacring its Muslim and Jewish inhabitants. This victory established the Latin Kingdom of Jerusalem and marked the high-water mark of Crusader success, planting a European colony in the heart of the Levant.
+                            </div>
+                            <div class="mt-auto flex gap-2 flex-wrap">
+                                <button class="text-sm bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-600 transition-colors read-more-btn">
+                                    Read More / Source
+                                </button>
+                            </div>
+                            <!-- Modal Content: Jerusalem -->
+                            <div class="modal-data" 
+                                 data-title="The First Crusade"
+                                 data-audio-src="https://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/The%20First%20Crusade.mp3">
+                                <h3>Significance</h3>
+                                <p>This crusade by the Frankish army reached its bloody climax with the siege and subsequent conquest of Jerusalem, a significant turning point in medieval history. After a grueling and arduous campaign that had lasted nearly three years, European forces, composed mainly of knights and soldiers from France, Italy, and other regions, launched a fierce assault on the city, which was held by Muslim forces under the Fatimid Caliphate.</p>
+                                <p>The siege of Jerusalem during the First Crusade was a brutal and bloody affair. The Crusaders, after weeks of hardship, famine, and relentless fighting, managed to breach the city's defenses. What followed was a horrific massacre, as the invaders violently slaughtered a significant portion of the city's Muslim and Jewish inhabitants. Historical accounts describe chaotic scenes of brutality, with civilians caught in the fray and many finding no refuge from the violence.</p>
+                                <p>This brutal conquest was not merely a military victory; it symbolized the high-water mark of the Crusader success, establishing the Latin Kingdom of Jerusalem. This new crusader state became a focal point of Christian power in the Levant, representing both the culmination of Christian efforts to reclaim the Holy Land and the initiation of centuries of conflict between Christians and Muslims. The establishment of the Latin Kingdom also marked the beginning of a European colony in this strategically important region, leading to a complex interplay of cultures, politics, and ongoing tensions that would shape the area's history for generations.</p>
+                                <p>The impact of the conquest of Jerusalem resonated far beyond the immediate violence. It profoundly influenced Christian and Muslim relations and initiated the Crusader states' presence in the Middle East, which would lead to more military expeditions and further conflicts in the years to come, including the subsequent Crusades.</p>
+                                <h3>Primary Source</h3>
+                                <blockquote>
+                                    "And at that place there was such a slaughter that our men were wading up to their ankles in blood."
+                                    <br>
+                                    <cite class="text-sm not-italic text-slate-400 block mt-2">— The Gesta Francorum, an anonymous eyewitness account from a Crusader soldier.</cite>
+                                </blockquote>
+                            </div>
+                        </div>
+                        
+                        <!-- 4. Fall of Edessa -->
+                        <div class="timeline-card">
+                            <img src="https://i.postimg.cc/vTqWGdFT/the-fall-of-edessa.jpg" alt="Fall of Edessa" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+                            <div class="card-date">1144 CE</div>
+                            <div class="card-title">The Fall of Edessa</div>
+                            <div class="card-description">
+                                Zangi, the Turkish atabeg of Mosul, captured Edessa, the first of the Crusader states to fall. This reversal shocked Europe, triggering the Second Crusade and signaling the beginning of a unified Muslim counter-response.
+                            </div>
+                            <div class="mt-auto flex gap-2 flex-wrap">
+                                <button class="text-sm bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-600 transition-colors read-more-btn">
+                                    Read More / Source
+                                </button>
+                            </div>
+                            <!-- Modal Content: Edessa -->
+                            <div class="modal-data" 
+                                 data-title="The Fall of Edessa"
+                                 data-audio-src="https://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/Edessa.mp3">
+                                <h3>Significance</h3>
+                                <p>Zangi, the Turkish atabeg of Mosul, played a pivotal role in the early stages of the Crusades by capturing the significant city of Edessa in 1144. Edessa was the first of the Crusader states established in the region, and its fall marked a critical turning point in the power dynamics between Christians and Muslims in the Holy Land. The swift and decisive capture of the city sent shockwaves throughout Europe, as it represented both a loss of Christian territory and a formidable challenge to the Crusader presence in the region.</p>
+                                <p>In response to this shocking event, a wave of alarm swept across Europe, leading to the mobilization of forces for what would become known as the Second Crusade. This massive military campaign aimed to reclaim Edessa and bolster the remaining Crusader states, reflecting the growing concern among Christian leaders about the resurgence of Muslim military strength under figures like Zangi.</p>
+                                <p>The capture of Edessa also signaled the emergence of a more unified Muslim counter-response. Zangi's victory galvanized various Muslim factions, fostering a sense of solidarity and purpose among them. It prompted leaders across the Islamic world to recognize the need for coordination and collaboration to resist the Crusaders' encroachments, laying the groundwork for future alliances against their common adversary. This shift significantly contributed to the reconfiguration of the regional political landscape, setting the stage for ensuing conflicts in the years to come.</p>
+                                <h3>Primary Source</h3>
+                                <blockquote>
+                                    "Towers, walls, and earthworks are of little value to a city unless there are defenders to man them."
+                                    <br>
+                                    <cite class="text-sm not-italic text-slate-400 block mt-2">— William of Tyre, a Crusader historian writing on the fall of the city, blaming its lack of defenders.</cite>
+                                </blockquote>
+                            </div>
+                        </div>
+                        
+                        <!-- 5. Battle of Hattin -->
+                        <div class="timeline-card">
+                            <img src="https://i.postimg.cc/sgvJDmcr/Horns-of-Hattin-1.jpg" alt="Battle of Hattin" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+                            <div class="card-date">1187 CE</div>
+                            <div class="card-title">The Battle of Hattin</div>
+                            <div class="card-description">
+                                Saladin (Salah al-Din) lured the Crusader army into a waterless trap near the Horns of Hattin, destroying their forces and capturing the King of Jerusalem. This decisive victory enabled Saladin to retake Jerusalem, effectively ending the First Crusade and shifting the balance of power permanently back in favor of the Muslims.
+                            </div>
+                            <div class="mt-auto flex gap-2 flex-wrap">
+                                <button class="text-sm bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-600 transition-colors read-more-btn">
+                                    Read More / Source
+                                </button>
+                            </div>
+                            <!-- Modal Content: Hattin -->
+                            <div class="modal-data" 
+                                 data-title="The Battle of Hattin"
+                                 data-audio-src="https://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/The%20Battle%20of%20Hattin.mp3">
+                                <h3>Significance</h3>
+                                <p>In the summer of 1187, Saladin (Salah al-Din), the prominent Muslim military leader and the Sultan of Egypt and Syria, executed a brilliant tactical maneuver that would change the course of the Crusades. He aimed to lure the Crusader army, led by King Guy of Lusignan, the King of Jerusalem, into a strategically disadvantageous position near the Horns of Hattin, a region of elevated terrain in present-day Israel.</p>
+                                <p>Saladin's forces, expertly utilizing their knowledge of the terrain and the harsh conditions of the region, set a bait for the Crusaders. They purposefully avoided confrontation while simultaneously cutting off access to water supplies, knowing that the Crusaders were heavily reliant on their ability to secure hydration and sustenance. The Crusader army, approximately 20,000 strong, marched into the trap, believing they could engage Saladin's relatively more minor forces in a decisive battle.</p>
+                                <p>As they approached the Horns of Hattin, the heat of the day combined with the lack of water began to take its toll on the Crusaders, weakening their morale and effectiveness. In a bold and well-coordinated attack, Saladin launched his forces against the beleaguered Crusaders during a fierce battle that lasted for hours. It was marked by heavy fighting and the strategic use of cavalry and archers, showcasing Saladin's military acumen.</p>
+                                <p>The outcome was catastrophic for the Crusader army. The forces of Saladin decisively defeated them, leading to the capture of key knights and leaders, including the King of Jerusalem himself. This significant victory not only led to the dramatic weakening of Christian military presence in the Holy Land but also paved the way for Saladin to recapture Jerusalem, an essential objective of the Crusaders since the onset of the First Crusade nearly a century earlier.</p>
+                                <p>The fall of Jerusalem under Saladin not only marked the effective end of the First Crusade but also led to a profound shift in the regional balance of power. It galvanized Muslim unity and resistance against the Crusader states, ensuring that the Muslim domain in the Middle East would remain strong for generations and permanently alter the region's geopolitical landscape.</p>
+                                <h3>Primary Source</h3>
+                                <blockquote>
+                                    "The arrows plunged into them, transforming their lions into hedgehogs."
+                                    <br>
+                                    <cite class="text-sm not-italic text-slate-400 block mt-2">— Imad ad-Din al-Isfahani, Saladin's personal secretary and an eyewitness to the battle.</cite>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ERA 2 EVENTS -->
+                    <div data-era-group="era2">
+                        <!-- 6. The Third Crusade -->
+                        <div class="timeline-card">
+                            <img src="https://i.postimg.cc/QxWt8W7D/048c3cd42d27d3bf266c7a8419cbae42.webp" alt="The Third Crusade" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+                            <div class="card-date">1189-1192 CE</div>
+                            <div class="card-title">The Third Crusade</div>
+                            <div class="card-description">
+                                Known as the "King's Crusade," this campaign pitted Richard the Lionheart against Saladin. Despite military successes for the Crusaders, they failed to retake Jerusalem, ending in a truce that allowed unarmed Christian pilgrims access to the city but left it in Muslim hands.
+                            </div>
+                            <div class="mt-auto flex gap-2 flex-wrap">
+                                <button class="text-sm bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-600 transition-colors read-more-btn">
+                                    Read More / Source
+                                </button>
+                            </div>
+                            <!-- Modal Content: Third Crusade -->
+                            <div class="modal-data" 
+                                 data-title="The Third Crusade"
+                                 data-audio-src="https://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/The%20Third%20Crusade.mp3">
+                                <h3>Significance</h3>
+                                <p>The campaign commonly referred to as the "King's Crusade" took place during the late 12th century and featured the legendary English king, Richard the Lionheart, leading a contingent of Crusaders against the formidable Muslim leader Saladin. Launched in 1190, this Crusade was part of the larger context of the Third Crusade, which aimed to reclaim Jerusalem and the surrounding territories that had fallen to Muslim control following the significant loss of the city in 1187.</p>
+                                <p>Richard, renowned for his military prowess and charismatic leadership, rallied an impressive coalition of forces from Europe, including knights and soldiers from England, France, and other regions. The campaign achieved several notable military victories, including the capture of the key coastal city of Acre following a protracted siege. This victory provided a critical foothold for the Crusaders in the Holy Land.</p>
+                                <p>However, despite these successes on the battlefield, the ultimate goal of retaking Jerusalem remained elusive. The Crusaders advanced toward the city but were met with strong resistance from Saladin's forces. After a series of battles and skirmishes, it became clear that a direct assault on Jerusalem would likely result in significant casualties without guaranteeing success.</p>
+                                <p>In 1192, after exhausting efforts and recognizing the futility of further conflict, Richard and Saladin entered negotiations for a truce. The resulting agreement allowed for a delicate compromise: Jerusalem would remain under Muslim control, but unarmed Christian pilgrims would be granted safe passage to visit the city's holy sites. This outcome was seen as a bittersweet resolution, as it didn't fulfill the Crusaders' primary goal of reclaiming Jerusalem. Yet, it permitted continued access for those who sought to visit the sacred city.</p>
+                                <p>The King's Crusade thus concluded with a tense peace, leaving a lasting legacy of both military engagement and diplomacy, and shaping the future interactions between the Christian and Muslim worlds in the region.</p>
+                                <h3>Primary Source</h3>
+                                <blockquote>
+                                    "The king of England was a powerful man, brave, energetic, and undaunted in battle."
+                                    <br>
+                                    <cite class="text-sm not-italic text-slate-400 block mt-2">— Baha al-Din ibn Shaddad, Saladin's biographer, writing about his enemy, Richard the Lionheart.</cite>
+                                </blockquote>
+                            </div>
+                        </div>
+                        
+                        <!-- 7. Sack of Constantinople -->
+                        <div class="timeline-card">
+                            <img src="https://i.postimg.cc/L64p7F85/Sack-of-Constantinople.png" alt="Sack of Constantinople" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+                            <div class="card-date">1204 CE</div>
+                            <div class="card-title">The Sack of Constantinople</div>
+                            <div class="card-description">
+                                In a shocking turn, the Fourth Crusade diverted from the Holy Land to sack the Christian city of Constantinople. This betrayal fatally weakened the Byzantine Empire, widened the schism between Catholic and Orthodox churches, and exposed the movement's shift from piety to plunder.
+                            </div>
+                            <div class="mt-auto flex gap-2 flex-wrap">
+                                <button class="text-sm bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-600 transition-colors read-more-btn">
+                                    Read More / Source
+                                </button>
+                            </div>
+                            <!-- Modal Content: 4th Crusade -->
+                            <div class="modal-data" 
+                                 data-title="The Sack of Constantinople"
+                                 data-audio-src="https://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/The%20Sack%20of%20Constantinople.mp3">
+                                <h3>Significance</h3>
+                                <p>In a shocking and unexpected turn of events, the Fourth Crusade, initially intended to reclaim the Holy Land from Muslim control, diverted its course towards Constantinople, a primarily Christian city and the capital of the Byzantine Empire. This dramatic betrayal marked a pivotal moment in history, as the crusaders, motivated by a mix of greed and political ambition, chose to sack the very heart of Eastern Christianity instead of focusing on their original mission.</p>
+                                <p>The Crusaders, enticed by promises of wealth and power, laid siege to Constantinople in 1204. Over the course of several brutal days, they looted the city, destroying its treasures, libraries, and churches while committing acts of violence against its inhabitants. This vicious assault not only allowed the Crusaders to accumulate vast riches but also critically weakened the Byzantine Empire, which had already been struggling with internal division and external threats.</p>
+                                <p>The aftermath of the sack had far-reaching consequences. It deepened the longstanding schism between the Catholic Church in the West and the Orthodox Church in the East, as the Byzantine Emperor was portrayed as a victim of Western treachery. The resentment and bitterness that followed this event further entrenched the divide, making any hopes of reconciliation increasingly distant.</p>
+                                <p>Moreover, the Fourth Crusade exemplified a significant shift in the motivations of the Crusading movement. What had begun as a call to arms rooted in piety and religious zealotry had devolved into an enterprise driven by avarice and conquest. This transformation underscored a broader trend within the Crusades, where the allure of material gain and power often overshadowed the ideals of faith and spirituality. Ultimately, the events surrounding the Fourth Crusade not only redefined the relationship between Western and Eastern Christianity but also foreshadowed the shifting dynamics of Medieval geopolitics.</p>
+                                <h3>Primary Source</h3>
+                                <blockquote>
+                                    "Oh, immortal God, how great the afflictions of the men, how great the distress!"
+                                    <br>
+                                    <cite class="text-sm not-italic text-slate-400 block mt-2">— Nicetas Choniates, a Byzantine historian and eyewitness who lost his home in the sack.</cite>
+                                </blockquote>
+                            </div>
+                        </div>
+
+                        <!-- 8. Treaty of Jaffa -->
+                        <div class="timeline-card">
+                            <img src="https://i.postimg.cc/x8T4sY3G/463061.jpg" alt="Treaty of Jaffa" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+                            <div class="card-date">1229 CE</div>
+                            <div class="card-title">The Treaty of Jaffa</div>
+                            <div class="card-description">
+                                Holy Roman Emperor Frederick II regained control of Jerusalem not through war, but through a diplomatic treaty with the Ayyubid Sultan al-Kamil. This decade-long truce demonstrated that pragmatism could occasionally prevail over religious zealotry, although it was condemned by the Pope.
+                            </div>
+                            <div class="mt-auto flex gap-2 flex-wrap">
+                                <button class="text-sm bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-600 transition-colors read-more-btn">
+                                    Read More / Source
+                                </button>
+                            </div>
+                            <!-- Modal Content: Jaffa -->
+                            <div class="modal-data" 
+                                 data-title="The Treaty of Jaffa"
+                                 data-audio-src="https://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/The%20Treaty%20of%20Jaffa.mp3">
+                                <h3>Significance</h3>
+                                <p>Holy Roman Emperor Frederick II managed to regain control of Jerusalem not through the conventional means of war, but rather through a strategic and skillful diplomatic treaty with the Ayyubid Sultan al-Kamil. This historic agreement, reached in 1229, was the culmination of a decade-long effort characterized by negotiations and a keen understanding of both political and religious dynamics in the region.</p>
+                                <p>Frederick approached the situation with a unique pragmatism that often contrasted sharply with the prevailing attitudes of intense religious zealotry of the time. While many leaders were eager to don their armor and engage in bloody crusades to reclaim the Holy Lands, Frederick opted for dialogue, appealing to the rational interests of both parties. His negotiations highlighted a remarkable level of diplomacy, allowing for the return of Jerusalem to Christian control without the loss of lives that typically accompanied military campaigns.</p>
+                                <p>The treaty stipulated that Christians could access the city and its holy sites, thereby allowing for a period of peace and coexistence. However, this approach was met with significant backlash, particularly from the Pope and ecclesiastical authorities, who condemned Frederick's diplomatic success as a betrayal of the ideals of the Crusades. Despite the papal condemnation, Frederick's tactful maneuvering set a noteworthy precedent for conflict resolution, suggesting that peace might be achieved through reason and compromise, at least temporarily, in an era deeply marked by conflict and religious fervor.</p>
+                                <h3>Primary Source</h3>
+                                <blockquote>
+                                    "This was the greatest of their misfortunes... that they were forced to give up Jerusalem, which was returned to the Franks."
+                                    <br>
+                                    <cite class="text-sm not-italic text-slate-400 block mt-2">— Ibn al-Athir, a Muslim chronicler expressing his disgust at the diplomatic handover of the city.</cite>
+                                </blockquote>
+                            </div>
+                        </div>
+
+                        <!-- 9. Seventh Crusade -->
+                        <div class="timeline-card">
+                            <img src="https://i.postimg.cc/J4sTtpTp/the-seventh-crusade.jpg" alt="The Seventh Crusade" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+                            <div class="card-date">1249-1250</div>
+                            <div class="card-title">The Seventh Crusade</div>
+                            <div class="card-description">
+                                King Louis IX's invasion of Egypt aimed to decapitate Ayyubid power but ended in his capture at Al-Mansurah. This disaster catalyzed the rise of the Mamluk Sultanate, shifting the regional power dynamic toward a new, more militarized Muslim leadership that would ultimately doom the Crusader states.
+                            </div>
+                            <div class="mt-auto flex gap-2 flex-wrap">
+                                <button class="text-sm bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-600 transition-colors read-more-btn">
+                                    Read More / Source
+                                </button>
+                            </div>
+                            <!-- Modal Content: 7th Crusade -->
+                            <div class="modal-data" 
+                                 data-title="The Seventh Crusade"
+                                 data-audio-src="https://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/The%20Seventh%20Crusade.mp3">
+                                <h3>Significance</h3>
+                                <p>King Louis IX of France, motivated by a desire to assert his authority and expand Christian influence in the Muslim world, launched an ambitious military campaign against Egypt in 1249. His objective was to deliver a decisive blow to the Ayyubid dynasty, which had been a formidable opponent to Christian forces during the Crusades. Louis believed that by conquering Egypt, he could undermine Ayyubid power, gain a strategic foothold, and ultimately facilitate the liberation of Jerusalem.</p>
+                                <p>However, as the campaign unfolded, it quickly turned disastrous for the Crusaders. Louis's forces encountered fierce resistance from the Ayyubids, particularly during the Siege of Al-Mansurah. The Crusaders were unprepared for the tenacity of the Egyptian defenders and suffered significant casualties. As the situation deteriorated, logistical challenges and disease further weakened Louis's army.</p>
+                                <p>Ultimately, the campaign culminated in Louis IX's capture by the Ayyubid forces in 1250, a humiliation that not only marked the failure of the French king's ambitions but also served as a pivotal moment in the history of the Crusades. His imprisonment sparked outrage in Europe, but it also created a power vacuum in the region.</p>
+                                <p>This misadventure expedited the rise of the Mamluk Sultanate, a military class of former slaves who seized control of Egypt. The Mamluks proved to be highly effective fighters and leaders, successfully rallying against the Crusader states and eventually driving them out of the Levant. This shift in leadership marked a significant transition in the region's power dynamics; the Mamluks established a more militarized and unified Muslim front against the remaining Crusader territories.</p>
+                                <p>The events following the failed invasion of Egypt signaled not only the decline of the Ayyubid dynasty but also the beginning of the end for the Crusader states in the Holy Land. The rise of the Mamluk Sultanate would ultimately lead to the consolidation of Muslim power and the complete expulsion of Crusaders from Jerusalem by 1291, sealing the fate of the Crusader presence in the region.</p>
+                                <h3>Primary Source</h3>
+                                <blockquote>
+                                    "I saw that the king [Louis IX] was taken; whereupon, I sheathed my sword and gave myself up as a prisoner."
+                                    <br>
+                                    <cite class="text-sm not-italic text-slate-400 block mt-2">— Jean de Joinville, a French knight and close friend of King Louis IX, who was captured with him at Al-Mansurah.</cite>
+                                </blockquote>
+                            </div>
+                        </div>
+                        
+                        <!-- 10. Battle of Ayn Jalut -->
+                        <div class="timeline-card">
+                            <img src="https://i.postimg.cc/tTm3jjHN/jalut.webp" alt="Battle of Ayn Jalut" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+                            <div class="card-date">1260 CE</div>
+                            <div class="card-title">The Battle of Ayn Jalut</div>
+                            <div class="card-description">
+                                The Mamluk Sultanate of Egypt defeated the Mongol army in Galilee, marking the first major defeat for the Mongols in the region. This victory halted their westward expansion, preserved Egypt as a Muslim power, and positioned the Mamluks as the new defenders of the faith.
+                            </div>
+                            <div class="mt-auto flex gap-2 flex-wrap">
+                                <button class="text-sm bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-600 transition-colors read-more-btn">
+                                    Read More / Source
+                                </button>
+                            </div>
+                            <!-- Modal Content: Ayn Jalut -->
+                            <div class="modal-data" 
+                                 data-title="The Battle of Ayn Jalut"
+                                 data-audio-src="https://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/The%20Battle%20of%20Ayn%20Jalut.mp3">
+                                <h3>Significance</h3>
+                                <p>The Mamluk Sultanate of Egypt achieved a historic and pivotal victory against the Mongol army in the Galilee region during the 13th century. This battle marked the first significant defeat for the Mongols in the Levant and had profound implications for the balance of power in the region.</p>
+                                <p>The Mongols, known for their formidable military prowess and relentless expansion across Asia and into Eastern Europe, faced stiff resistance from the Mamluks, who had recently consolidated their power in Egypt following the decline of the Ayyubid dynasty. The Mamluks, primarily composed of former slave soldiers who had risen to positions of authority, were motivated not only by the defense of their territory but also by a commitment to protect the Islamic faith against the advancing Mongol threat.</p>
+                                <p>The battle itself was characterized by strategic innovations and effective cavalry maneuvers, showcasing the Mamluks' superior knowledge of the local terrain and their adeptness in mobile warfare. This decisive engagement halted the Mongol advance westward, preserving Egypt as a crucial bastion of Muslim power in the region and preventing the potential spread of Mongol influence into North Africa.</p>
+                                <p>In the aftermath of this victory, the Mamluks cemented their reputation as the defenders of Islam, gaining both legitimacy and support from various Muslim factions. The triumph at Galilee also strengthened the Mamluk Sultanate's position in the broader geopolitical landscape, allowing it to emerge as a dominant force in the Middle East and influencing the course of Islamic history for years to come. This landmark battle not only marked a turning point in military history but also redefined the relationship between the Islamic world and the Mongolian Empire.</p>
+                                <h3>Primary Source</h3>
+                                <blockquote>
+                                    "When the sultan Qutuz saw the ranks of the Mongols break... he cried out in a great voice, 'O Islam!'"
+                                    <br>
+                                    <cite class="text-sm not-italic text-slate-400 block mt-2">— Al-Maqrizi, an Egyptian historian describing the Mamluk victory over the Mongols.</cite>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ERA 3 EVENTS -->
+                    <div data-era-group="era3">
+                        <!-- 11. Fall of Acre -->
+                        <div class="timeline-card">
+                            <img src="https://i.postimg.cc/G3VVCBrF/the-Fall-of-acrre.jpg" alt="Fall of Acre" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+                            <div class="card-date">1291 CE</div>
+                            <div class="card-title">The Fall of Acre</div>
+                            <div class="card-description">
+                                The Mamluks stormed Acre, the last major Crusader stronghold, driving the "Franj" into the sea. This marked the definitive end of the European military presence in the Levant, closing the era of the Crusades but leaving behind a militarized and suspicious Islamic world.
+                            </div>
+                            <div class="mt-auto flex gap-2 flex-wrap">
+                                <button class="text-sm bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-600 transition-colors read-more-btn">
+                                    Read More / Source
+                                </button>
+                            </div>
+                            <!-- Modal Content: Acre -->
+                            <div class="modal-data" 
+                                 data-title="The Fall of Acre"
+                                 data-audio-src="httpshttps://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/The%20fall%20of%20Acre.mp3">
+                                <h3>Significance</h3>
+                                <p>The Mamluks, a powerful military caste in Egypt, launched a fierce assault on Acre in 1291, the final significant stronghold of the Crusaders in the Levant. This coastal city had endured various sieges and battles throughout the Crusades, but the Mamluks were determined to reclaim it decisively. Their well-coordinated attack involved not just numerical superiority but also effective siege tactics, and over the course of several months, they managed to breach Acre's formidable defenses.</p>
+                                <p>As the Mamluks stormed into the city, the situation for the remaining Crusader defenders became increasingly dire. Many of the "Franj," or Europeans residing in the town, found themselves fleeing in panic, desperately attempting to escape the onslaught. The fall of Acre was catastrophic; thousands were killed, and many more were captured or forced into servitude. The city, once a beacon of European military ambition and a symbol of Christendom's foothold in the Holy Land, was left in ruins.</p>
+                                <p>The fall of Acre marked the definitive end of the Crusader presence in the Levant. With it came the conclusion of nearly two centuries of intermittent military conflict between Christian and Muslim powers in the region. The obliteration of Crusader ambitions marked the end of a tumultuous chapter in medieval history, one that had witnessed the rise and fall of fortified territories and bloody confrontations over sacred ground.</p>
+                                <p>However, this end was not without significant repercussions. The victorious Mamluks solidified their grip over the region, leading to a period of militarization and vigilance in the Islamic world. Christian forces, having been expelled from their last foothold, left behind a legacy of mistrust and lingering animosity, shaping future interactions between the Islamic and Christian worlds. The harsh realities of the Crusades and their conclusion fostered an environment of suspicion that would long linger and influence the socio-political dynamics in the Middle East.</p>
+                                <h3>Primary Source</h3>
+                                <blockquote>
+                                    "And so the city of Acre was lost, and all the Christians who were in it were either dead or captured."
+                                    <br>
+                                    <cite class="text-sm not-italic text-slate-400 block mt-2">— The "Templar of Tyre", an eyewitness who dictated his account of the city's final, brutal moments.</cite>
+                                </blockquote>
+                            </div>
+                        </div>
+                        
+                        <!-- 12. Rise of Osman Ghazi -->
+                        <div class="timeline-card">
+                            <img src="https://i.postimg.cc/Hkp2DHJV/Kurulus-Osman-1.jpg" alt="Rise of Osman Ghazi" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+                            <div class="card-date">1299 CE</div>
+                            <div class="card-title">The Rise of Osman Ghazi</div>
+                            <div class="card-description">
+                                From the anarchic frontier left by the Crusades and Mongol invasions, Osman Ghazi forged a new state dedicated to ghaza (holy war). This militarized principality would grow into the Ottoman Empire—a direct political response to the power vacuums of the era.
+                            </div>
+                            <div class="mt-auto flex gap-2 flex-wrap">
+                                <button class="text-sm bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-600 transition-colors read-more-btn">
+                                    Read More / Source
+                                </button>
+                            </div>
+                            <!-- Modal Content: Osman -->
+                            <div class="modal-data" 
+                                 data-title="The Rise of Osman Ghazi"
+                                 data-audio-src="https://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/The%20Rise%20of%20Osam%20Ghazi.mp3">
+                                <h3>Significance</h3>
+                                <p>In the wake of the Crusades and the invasions by the Mongols, the landscape of the region was left in a state of turmoil and disarray. This chaotic environment, characterized by shifting alliances and fragmented territories, provided a unique opportunity for ambitious leaders. Among them was Osman Ghazi, who emerged as a pivotal figure in this era of upheaval.</p>
+                                <p>Osman, driven by a vision of unity and expansion, sought to establish a new state grounded in the principles of jihad, or holy war. This concept not only motivated his military campaigns but also fostered a sense of religious duty among his followers. By rallying support from disaffected tribes and communities who had suffered under the invasions, he was able to form a principality that would serve as a bulwark against external threats while promoting the spread of Islam.</p>
+                                <p>Under Osman's leadership, this militarized principality began to consolidate power, strategically utilizing both diplomatic and military tactics to reclaim territories and enhance its influence. His successors would continue to build on this foundation, expanding the state's reach and solidifying its authority. Over time, what initially began as a small frontier principality would evolve into the vast Ottoman Empire, one of the most potent and enduring empires in history.</p>
+                                <p>The establishment of the Ottoman Empire was not merely a byproduct of conquest; it was a direct political response to the power vacuums created by the disintegration of previous empires and the lingering effects of continuous warfare. The Ottomans effectively filled these vacuums, creating a centralized authority that brought stability to a region often torn apart by strife and division. Through a combination of military strength, strategic marriages, and an administrative framework that integrated diverse populations, the empire laid the groundwork for a remarkable legacy that would shape the course of history for centuries to come.</p>
+                                <h3>Primary Source</h3>
+                                <blockquote>
+                                    "He saw that a moon arose from the holy man's breast and came to sink in his own breast, and from his navel a tree sprouted, and its shade compassed the world."
+                                    <br>
+                                    <cite class="text-sm not-italic text-slate-400 block mt-2">— Aşıkpaşazade, a 15th-century Ottoman chronicler recording the "Dream of Osman," the founding myth of the empire.</cite>
+                                </blockquote>
+                            </div>
+                        </div>
+                        
+                        <!-- 13. Fall of Constantinople -->
+                        <div class="timeline-card">
+                            <img src="https://i.postimg.cc/yd5Qs5q6/Fall-of-Constatinople.jpg" alt="Fall of Constantinople" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+                            <div class="card-date">1453 CE</div>
+                            <div class="card-title">The Fall of Constantinople</div>
+                            <div class="card-description">
+                                The Ottoman conquest of Constantinople was the final death knell of the Byzantine Empire, which had been fatally weakened centuries earlier by the Fourth Crusade. Mehmed II's victory fulfilled the Islamic dream of toppling the "New Rome," cementing the Ottomans as the new superpower.
+                            </div>
+                            <div class="mt-auto flex gap-2 flex-wrap">
+                                <button class="text-sm bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-600 transition-colors read-more-btn">
+                                    Read More / Source
+                                </button>
+                            </div>
+                            <!-- Modal Content: Constantinople 1453 -->
+                            <div class="modal-data" 
+                                 data-title="The Fall of Constantinople"
+                                 data-audio-src="https://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/The%20Fall%20of%20Constantinople.mp3">
+                                <h3>Significance</h3>
+                                <p>The Ottoman conquest of Constantinople in 1453 marked the definitive end of the Byzantine Empire, a once-thriving center of Eastern Christianity and culture. The Byzantines had faced mounting challenges for centuries, most notably the devastating impact of the Fourth Crusade in 1204, when the Crusaders breached the city and established a short-lived Latin Empire. This event significantly weakened the Byzantine state, leading to its fragmentation and decline.</p>
+                                <p>Mehmed II, known as Mehmed the Conqueror, ascended to the Ottoman throne in 1444 and returned to power in 1451, determined to capture Constantinople, often referred to as "New Rome." His campaign was meticulously planned, leveraging the Ottomans' advanced military strategies and artillery technology, including the use of large cannons that could breach the formidable city walls.</p>
+                                <p>The siege began on April 6, 1453, and lasted until May 29, when the Ottomans stormed the city after weeks of relentless bombardment and strategic maneuvers. The fall of Constantinople was not merely a military victory; it represented the culmination of centuries of Islamic aspirations to control the significant Christian center, symbolizing the shift of power from Christendom to the Islamic world.</p>
+                                <p>With this conquest, Mehmed II not only solidified the Ottomans as a dominant superpower in both the Mediterranean and the broader European context but also transformed Constantinople into Istanbul, which would flourish as the new capital of the Ottoman Empire. This event heralded a new era in history, marking the increased Islamic influence in southeastern Europe and the transition from the medieval period to the early modern age.</p>
+                                <h3>Primary Source</h3>
+                                <blockquote>
+                                    "On Tuesday, May 29, early in the day, the sultan took possession of our City; in this time of capture, my late master and emperor, Lord Constantine, was killed."
+                                    <br>
+                                    <cite class="text-sm not-italic text-slate-400 block mt-2">— George Sphrantzes, a Byzantine courtier and eyewitness who was a close friend of the last emperor.</cite>
+                                </blockquote>
+                            </div>
+                        </div>
+
+                        <!-- 14. Fall of Granada -->
+                        <div class="timeline-card">
+                            <img src="https://i.postimg.cc/50qyVcQH/the-Fall-of-Grenada.jpg" alt="Fall of Granada" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+                            <div class="card-date">1492 CE</div>
+                            <div class="card-title">The Fall of Granada</div>
+                            <div class="card-description">
+                                In the same year that Columbus sailed, the Catholic Monarchs Ferdinand and Isabella conquered Granada, the last Muslim stronghold on the Iberian Peninsula. This victory marked the violent conclusion of the Reconquista, ending nearly 800 years of Muslim presence in Al-Andalus and consolidating a militant, crusading Catholic Spain.
+                            </div>
+                            <div class="mt-auto flex gap-2 flex-wrap">
+                                <button class="text-sm bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-600 transition-colors read-more-btn">
+                                    Read More / Source
+                                </button>
+                            </div>
+                            <!-- Modal Content: Granada -->
+                            <div class="modal-data" 
+                                 data-title="The Fall of Granada"
+                                 data-audio-src="httpshttps://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/The%20Fall%20of%20Grenada.mp3">
+                                <h3>Significance</h3>
+                                <p>In 1492, the same year that Christopher Columbus embarked on his historic voyage across the Atlantic Ocean, the Catholic Monarchs Ferdinand II of Aragon and Isabella I of Castile achieved a significant military victory by conquering Granada, the final bastion of Muslim rule on the Iberian Peninsula. This conquest not only symbolized the end of the Islamic presence in the region, marking the culmination of the nearly 800-year-long period known as the Reconquista, but also signified a critical turning point in Spanish history.</p>
+                                <p>The Reconquista was characterized by a series of military campaigns undertaken by the Christian kingdoms of Spain to reclaim territory that Muslims had occupied since the early 8th century. The capture of Granada, which had remained a stronghold for the Nasrid dynasty, was a result of prolonged siege and warfare, encapsulating the fierce contest between Christian and Muslim powers. With this victory, Ferdinand and Isabella aimed to unify their realms under a single religious banner, reinforcing their commitment to Catholicism as a central tenet of their rule.</p>
+                                <p>The successful expulsion of Muslim rule had profound consequences, as it not only closed a significant chapter of religious and cultural diversity in Spain but also fueled a sense of nationalistic pride among Christians. This newfound consolidation of power enabled Ferdinand and Isabella to focus their ambitions beyond the Iberian Peninsula. Driven by the spirit of the Reconquista, they turned their sights westward, ultimately leading to Columbus's expedition. The monarchs equipped Columbus with ships and support, launching an era of exploration and colonization that would mark Spain as a leading power in the New World.</p>
+                                <p>The impact of the conquest of Granada and the subsequent voyages to the Americas sparked a legacy of both cultural exchange and conflict that would shape global history for centuries to come, highlighting the interwoven fates of Europe and the newly encountered lands across the ocean.</p>
+                                <h3>Primary Source</h3>
+                                <blockquote>
+                                    "On the second of January... the Moorish King, weeping, handed over the keys of the city and the fortress of the Alhambra to our King."
+                                    <br>
+                                    <cite class="text-sm not-italic text-slate-400 block mt-2">— Peter Martyr d'Anghiera, an Italian historian at the Spanish court who witnessed the surrender.</cite>
+                                </blockquote>
+                            </div>
+                        </div>
+                        
+                        <!-- 15. Age of Discovery -->
+                        <div class="timeline-card">
+                            <img src="https://i.postimg.cc/5Npzzz08/Vasco-de-Gama.webp" alt="Age of Discovery" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+                            <div class="card-date">1498 CE</div>
+                            <div class="card-title">The Age of Discovery</div>
+                            <div class="card-description">
+                                Blocked by the hostile "Muslim Lake" of the Ottoman and Mamluk empires—a geopolitical legacy of the Crusades—European powers were compelled to seek alternative sea routes to the East. Vasco da Gama's arrival in India marked the beginning of European colonial imperialism, a direct economic "blowback" from the failure to hold the Holy Land.
+                            </div>
+                            <div class="mt-auto flex gap-2 flex-wrap">
+                                <button class="text-sm bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-600 transition-colors read-more-btn">
+                                    Read More / Source
+                                </button>
+                            </div>
+                            <!-- Modal Content: Discovery -->
+                            <div class="modal-data" 
+                                 data-title="The Age of Discovery (Vasco da Gama)"
+                                 data-audio-src="https://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/The%20Age%20of%20Discovery.mp3">
+                                <h3>Significance</h3>
+                                <p>The geopolitical landscape of the late medieval period was heavily influenced by the complex legacy of the Crusades, particularly the establishment of the so-called "Muslim Lake," a term that refers to the domination of the Mediterranean and Indian Ocean trade routes by the Ottoman Empire and the Mamluk Sultanate. These two powerful entities effectively obstructed European access to lucrative markets in the East, leaving European powers in a precarious position. As a result, they were driven to explore alternative maritime pathways to reach the rich spices, silks, and other goods that were in high demand.</p>
+                                <p>The pivotal moment came with Vasco da Gama's momentous arrival in India in 1498, marking the beginning of a new era of European engagement with Asia. This voyage marked not only the establishment of a sea route to India around the southern tip of Africa, but also the beginning of European colonial imperialism in the region. The implications of this endeavor were profound, fueling a competitive scramble among European nations for territorial expansion and control over trade routes.</p>
+                                <p>The impetus for this quest for new routes was, in part, a direct consequence of the inability of European powers to maintain control over the Holy Land during the Crusades. The subsequent failure left lasting scars, prompting a desire to find new means of generating wealth and exerting influence. Thus, the arrival of da Gama in India can be seen as a significant economic "blowback," where the repercussions of previous military and religious conflicts reshaped the trajectory of European powers. This quest for alternative routes not only transformed trade dynamics but ultimately led to the establishment of colonial empires that would have lasting effects on global history.</p>
+                                <h3>Primary Source</h3>
+                                <blockquote>
+                                    "The first greeting that he received was in these words: 'May the Devil take thee! What brought you hither?'"
+                                    <br>
+                                    <cite class="text-sm not-italic text-slate-400 block mt-2">— The Roteiro (Journal) of Vasco da Gama's Voyage, recording the hostile reception from Arabic-speaking merchants upon arriving in India.</cite>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="scroll-arrow right" aria-label="Scroll right">&gt;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="details-modal" class="hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="modal-container">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h3 id="modal-title" class="modal-title font-cinzel">Loading...</h3>
+                <button id="modal-close-btn" class="modal-close-btn" aria-label="Close modal">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <!-- Modal Content -->
+            <div id="modal-content" class="modal-content">
+                <!-- Audio player will be inserted here by JS -->
+                <audio id="modal-audio-player" controls preload="none" src=""></audio>
+                <!-- Text content will be inserted here by JS -->
             </div>
         </div>
     </div>
     
     <script type="module">
-        // --- Modal Control ---
-        const modal = document.getElementById('gemini-modal');
-        const modalTitle = document.getElementById('modal-title');
-        const modalContent = document.getElementById('modal-content');
-        const closeModalBtn = document.getElementById('modal-close-btn');
-
-        function showModal(title, htmlContent) {
-            modalTitle.textContent = title;
-            modalContent.innerHTML = htmlContent;
-            modal.classList.remove('hidden');
-        }
-
-        function hideModal() {
-            modal.classList.add('hidden');
-        }
-
-        // Close modal listeners
-        closeModalBtn.addEventListener('click', hideModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                hideModal();
-            }
-        });
-
-        // --- New Timeline Logic ---
-        
-        const eraTimeline = document.getElementById('era-timeline');
-        const subTimeline = document.getElementById('sub-timeline');
-        const subTimelineTitle = document.getElementById('sub-timeline-title');
-        const subTimelineEvents = document.getElementById('sub-timeline-events');
-        const eventDataStore = document.getElementById('event-data-store');
-
-        // --- New Scroll Button Logic ---
-        const scrollLeftBtn = document.getElementById('scroll-left-btn');
-        const scrollRightBtn = document.getElementById('scroll-right-btn');
-        const cardWidth = 320 + 16; // 320px card + 16px (1rem) margin
-
-        scrollLeftBtn.addEventListener('click', () => {
-            subTimelineEvents.scrollBy({ left: -cardWidth, behavior: 'smooth' });
-        });
-
-        scrollRightBtn.addEventListener('click', () => {
-            subTimelineEvents.scrollBy({ left: cardWidth, behavior: 'smooth' });
-        });
-        // --- End New Scroll Button Logic ---
-
-        // Listen for clicks on the Era cards
-        eraTimeline.addEventListener('click', (e) => {
-            const eraCard = e.target.closest('.era-card'); // Fixed: was '.era.card'
-            if (!eraCard) return;
-
-            const eraId = eraCard.dataset.era;
-            const eraTitle = eraCard.dataset.title;
-            const eventGroup = eventDataStore.querySelector(`[data-era-group="${eraId}"]`);
-
-            // Remove 'selected' from all other era cards
-            eraTimeline.querySelectorAll('.era-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            // Add 'selected' to the clicked card
-            eraCard.classList.add('selected');
-
-            if (eventGroup) {
-                // Set the title and content for the sub-timeline
-                subTimelineTitle.textContent = eraTitle;
-                subTimelineEvents.innerHTML = eventGroup.innerHTML;
-                
-                // Show the sub-timeline
-                subTimeline.classList.remove('hidden');
-
-                // Reset scroll position when changing eras
-                subTimelineEvents.scrollLeft = 0;
-            }
-        });
-
-        // Listen for "Read More" clicks on the *sub-timeline*
-        subTimelineEvents.addEventListener('click', (e) => {
-            const target = e.target;
+        document.addEventListener('DOMContentLoaded', () => {
+            const eraCards = document.querySelectorAll('.era-card');
+            const subTimelineContainer = document.getElementById('sub-timeline-container');
+            const subTimelineScroll = subTimelineContainer.querySelector('.horizontal-timeline-scroll');
+            const subTimelineGroups = subTimelineScroll.querySelectorAll('[data-era-group]');
+            const modal = document.getElementById('details-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+            const modalAudioPlayer = document.getElementById('modal-audio-player'); // Get audio player
             
-            if (target.classList.contains('open-modal-btn')) {
-                const eventCard = target.closest('.timeline-card');
-                if (!eventCard) return;
+            // --- Era Timeline Logic ---
+            eraCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const selectedEra = card.dataset.era;
+                    
+                    // Toggle active class on era cards
+                    eraCards.forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                    
+                    // Show/Hide sub-timeline groups
+                    subTimelineGroups.forEach(group => {
+                        if (group.dataset.eraGroup === selectedEra) {
+                            group.style.display = 'flex';
+                        } else {
+                            group.style.display = 'none';
+                        }
+                    });
+                    
+                    // Show the sub-timeline container
+                    subTimelineContainer.style.display = 'block';
+                    // Reset scroll position
+                    subTimelineScroll.scrollLeft = 0;
+                });
+            });
 
-                const title = eventCard.querySelector('.card-title').textContent;
-                const modalDataEl = eventCard.querySelector('.modal-data');
+            // --- Sub-Timeline Scrolling Arrows ---
+            const scrollLeftBtn = subTimelineContainer.querySelector('.scroll-arrow.left');
+            const scrollRightBtn = subTimelineContainer.querySelector('.scroll-arrow.right');
+            
+            scrollLeftBtn.addEventListener('click', () => {
+                // Scroll left by one card width (300px) + margin (32px)
+                subTimelineScroll.scrollBy({ left: -332, behavior: 'smooth' });
+            });
+            
+            scrollRightBtn.addEventListener('click', () => {
+                // Scroll right by one card width (300px) + margin (32px)
+                subTimelineScroll.scrollBy({ left: 332, behavior: 'smooth' });
+            });
+
+            // --- Modal Logic ---
+            function showModal(title, contentHTML, audioSrc) {
+                modalTitle.textContent = title;
                 
-                if (modalDataEl) {
-                    showModal(title, modalDataEl.innerHTML);
+                // Clear old content
+                const existingContent = modalContent.querySelector('.dynamic-content');
+                if (existingContent) {
+                    modalContent.removeChild(existingContent);
+                }
+                
+                // Create a div for the text content
+                const textContentDiv = document.createElement('div');
+                textContentDiv.className = 'dynamic-content';
+                textContentDiv.innerHTML = contentHTML;
+                
+                // Add the text content *after* the audio player
+                modalContent.appendChild(textContentDiv);
+
+                // Handle Audio
+                if (audioSrc && audioSrc.trim() !== "") {
+                    modalAudioPlayer.setAttribute('src', audioSrc);
+                    modalAudioPlayer.style.display = 'block';
+                    // modalAudioPlayer.load(); // Removed this
+                    // modalAudioPlayer.play(); // Removed this - Autoplay is blocked
                 } else {
-                    showModal(title, "<p>Content for this section is not available yet.</p>");
+                    modalAudioPlayer.style.display = 'none';
+                    modalAudioPlayer.setAttribute('src', '');
+                }
+                
+                modal.classList.remove('hidden');
+            }
+
+            function hideModal() {
+                // CRITICAL: Stop and reset audio on modal close
+                modalAudioPlayer.pause();
+                modalAudioPlayer.currentTime = 0;
+                modalAudioPlayer.setAttribute('src', ''); // Clear the source
+                
+                modal.classList.add('hidden');
+                modalTitle.textContent = '';
+                
+                const dynamicContent = modalContent.querySelector('.dynamic-content');
+                if (dynamicContent) {
+                    modalContent.removeChild(dynamicContent);
                 }
             }
-        });
+            
+            // Event delegation for all "Read More" buttons
+            subTimelineScroll.addEventListener('click', (e) => {
+                if (e.target.classList.contains('read-more-btn')) {
+                    const card = e.target.closest('.timeline-card');
+                    const modalData = card.querySelector('.modal-data');
+                    
+                    if (modalData) {
+                        const title = modalData.dataset.title;
+                        const contentHTML = modalData.innerHTML;
+                        const audioSrc = modalData.dataset.audioSrc || ''; // Get the audio src
+                        
+                        showModal(title, contentHTML, audioSrc);
+                    }
+                }
+            });
 
+            // Close modal listeners
+            modalCloseBtn.addEventListener('click', hideModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    hideModal();
+                }
+            });
+        });
     </script>
 
 </body>
