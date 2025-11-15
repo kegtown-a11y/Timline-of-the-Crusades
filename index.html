@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-g">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizontal Timeline of the Crusades</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --font-body: 'Inter', sans-serif;
+            --font-theme: 'Cinzel', serif;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: #0f172a;
+            background-image: url('https://blogs.thegospelcoalition.org/kevindeyoung/files/2015/02/crusades.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: #f1f5f9;
+        }
+
+        .overlay {
+            background-color: rgba(50, 10, 10, 0.95);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        h1, h2, h3 {
+            font-family: var(--font-theme);
+        }
+
+        .horizontal-timeline-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding-bottom: 2rem;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #64748b #334155;
+        }
+
+        /* This centers the top-level Era container */
+        .era-container {
+            justify-content: center;
+        }
+
+        .horizontal-timeline-container::-webkit-scrollbar {
+            height: 14px; /* Increased from 10px */
+        }
+        .horizontal-timeline-container::-webkit-scrollbar-track {
+            background: #334155;
+            border-radius: 5px;
+        }
+        .horizontal-timeline-container::-webkit-scrollbar-thumb {
+            background-color: #64748b;
+            border-radius: 5px;
+            border: 3px solid #334155; /* Increased from 2px */
+        }
+
+        .timeline-card, .era-card {
+            flex: 0 0 320px;
+            scroll-snap-align: center;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            margin: 1rem;
+            /* padding: 1.5rem; */ /* Padding removed for era card image */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            border: 1px solid #334155;
+        }
+
+        .timeline-card {
+            background-color: #1e293b;
+            padding: 1.5rem; /* Add padding back to timeline cards */
+        }
+
+        .era-card {
+            background-color: #334155;
+            /* justify-content: center; */ /* Removed */
+            /* text-align: center; */ /* Removed */
+            padding: 0; /* Padding removed for flush image */
+            cursor: pointer;
+        }
+        
+        .era-title {
+            font-family: var(--font-theme);
+            font-size: 1.75rem;
+            color: #ef4444;
+        }
+        
+        .era-subtitle {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            color: #cbd5e1;
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        .timeline-card:hover, .era-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Style for the selected Era card */
+        .era-card.selected {
+            border-color: #ef4444; /* red-500 */
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
+            transform: translateY(-5px);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #334155;
+        }
+        
+        .era-card-image {
+            width: 100%;
+            height: 144px; /* h-36 */
+            object-fit: contain; /* Changed from 'cover' to 'contain' */
+            border-radius: 11px 11px 0 0; /* rounded-t-lg (12px) minus border (1px) */
+        }
+
+        .card-date {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #ef4444;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-title {
+            font-family: var(--font-theme);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-description {
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #cbd5e1;
+            flex-grow: 1;
+            margin-bottom: 1rem;
+        }
+
+        /* Modal styles */
+        #gemini-modal.hidden {
+            display: none;
+        }
+        #modal-title {
+            font-family: var(--font-theme);
+        }
+        #modal-response {
+            font-family: var(--font-body);
+        }
+
+    </style>
+</head>
+<body class="h-full">
+
+    <div class="overlay">
+        <div class="container mx-auto px-4 py-12">
+            
+            <!-- Centered Header Block -->
+            <div class="flex flex-col items-center">
+                <div class="flex justify-center mb-6">
+                    <img src="https://i.postimg.cc/W143cJXv/banner.png" 
+                         alt="Project Header Image" 
+                         class="max-w-full h-auto rounded-lg"
+                         onerror="this.src='https://placehold.co/600x150/1e293b/f1f5f9?text=Image+Missing'; this.onerror=null;">
+                </div>
+    
+                <h1 class="text-4xl md:text-5xl font-bold text-center text-slate-100 mb-4">
+                    Horizontal Timeline of the Crusades
+                </h1>
+                <p class="text-center text-lg text-slate-300 mb-16 max-w-2xl mx-auto">
+                    Explore the major military campaigns, figures, and events of the Crusades. Click an era to explore its events.
+                </p>
+            </div>
+            
+
+<!-- Main Era Timeline -->
+<div id="era-timeline" class="horizontal-timeline-container era-container">
+
+                <!-- ERA 1 CARD -->
+                <div class="era-card" data-era="era1" data-title="Prelude to a Clash of Gods (1071-1187)">
+                    <img src="https://i.postimg.cc/c4Bm5P5F/jerusalem-cross-medieval-knights-cross-crusader-beltschazar-transparent.png" alt="Prelude" class="era-card-image" onerror="this.src='https://placehold.co/320x150/334155/ef4444?text=Image+Error'; this.onerror=null;">
+                    <div class="p-6 text-center">
+                        <h2 class="era-title">Prelude to a Clash of Gods</h2>
+                        <h3 class="era-subtitle">(1071-1187)</h3>
+                        <p class="card-description mt-4 mb-0">The geopolitical fractures and the inciting incidents that launched the conflict.</p>
+                    </div>
+                </div>
+                
+                <!-- ERA 2 CARD -->
+                <div class="era-card" data-era="era2" data-title="The Theology of Aggression (1189-1260)">
+                    <img src="https://i.postimg.cc/c4Bm5P5F/jerusalem-cross-medieval-knights-cross-crusader-beltschazar-transparent.png" alt="Theology of Aggression" class="era-card-image" onerror="this.src='https://placehold.co/320x150/334155/ef4444?text=Image+Error'; this.onerror=null;">
+                    <div class="p-6 text-center">
+                        <h2 class="era-title">The Theology of Aggression</h2>
+                        <h3 class="era-subtitle">(1189-1260)</h3>
+                        <p class="card-description mt-4 mb-0">The escalation of violence, the internal decay of the Crusading movement, and the rise of new powers.</p>
+                    </div>
+                </div>
+
+                <!-- ERA 3 CARD -->
+                <div class="era-card" data-era="era3" data-title="The Lasting Stains of Blood (1291-1498)">
+                    <img src="https://i.postimg.cc/c4Bm5P5F/jerusalem-cross-medieval-knights-cross-crusader-beltschazar-transparent.png" alt="Lasting Stains" class="era-card-image" onerror="this.src='https://placehold.co/320x150/334155/ef4444?text=Image+Error'; this.onerror=null;">
+                    <div class="p-6 text-center">
+                        <h2 class="era-title">The Lasting Stains of Blood</h2>
+                        <h3 class="era-subtitle">(1291-1498)</h3>
+                        <p class="card-description mt-4 mb-0">The long-term consequences, the rise of new empires from the ashes, and the shift in global power.</p>
+                    </div>
+                </div>
+</div>
+
+<!-- Sub-Timeline Container (starts hidden) -->
+<div id="sub-timeline" class="mt-12 hidden relative"> <!-- Added relative positioning -->
+    <h3 id="sub-timeline-title" class="text-3xl font-bold text-red-500 mb-4 ml-4"></h3>
+    
+    <!-- Scroll Buttons -->
+    <button id="scroll-left-btn" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-slate-800 bg-opacity-70 hover:bg-opacity-100 p-2 rounded-full text-white transition-all" style="transform: translate(-50%, -50%); left: 2rem;">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+    </button>
+    <button id="scroll-right-btn" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-slate-800 bg-opacity-70 hover:bg-opacity-100 p-2 rounded-full text-white transition-all" style="transform: translate(50%, -50%); right: 2rem;">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+    </button>
+
+    <div id="sub-timeline-events" class="horizontal-timeline-container">
+        <!-- Event cards will be injected here by JavaScript -->
+    </div>
+</div>
+
+
+<!-- =================================================================== -->
+<!-- EVENT DATA STORE (HIDDEN) -->
+<!-- All timeline cards are stored here and copied into the sub-timeline -->
+<!-- =================================================================== -->
+<div id="event-data-store" class="hidden">
+
+    <!-- ERA 1 EVENTS -->
+    <div data-era-group="era1">
+        <!-- 1. Battle of Manzikert -->
+        <div class="timeline-card">
+            <img src="https://i.postimg.cc/DZfFL9Dt/1706475713-333-Byzantine-defeat-at-Manzikert.webp" alt="Battle of Manzikert" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+            <div class="card-date">1071 CE</div>
+            <div class="card-title">The Battle of Manzikert</div>
+            <div class="card-description">
+                The Seljuk Sultan Alp Arslan decimated the Byzantine army, capturing Emperor Romanus Diogenes. This "seminal catastrophe" shattered Byzantine power in Anatolia, opening the region to Turkish migration and eventually compelling Emperor Alexios I to appeal to Rome for aid—the direct catalyst for the First Crusade.
+            </div>
+            <div class="mt-auto flex gap-2 flex-wrap">
+                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
+                    Read More / Source
+                </button>
+            </div>
+            <div class="modal-data hidden">
+                <div class="modal-more-info">
+                    <p>[Additional 1-2 paragraphs for Clermont go here.]</p>
+                </div>
+                <div class="modal-primary-source mt-6">
+                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
+                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
+                        "[Primary source quote for Clermont goes here.]"
+                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Conquest of Jerusalem -->
+        <div class="timeline-card">
+            <img src="https://i.postimg.cc/N05ZtQ38/The-capture-of-Jersalem.jpg" alt="The Conquest of Jerusalem" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+            <div class="card-date">1099 CE</div>
+            <div class="card-title">The Conquest of Jerusalem</div>
+            <div class="card-description">
+                The bloody climax of the First Crusade saw European forces breach the walls of Jerusalem, massacring its Muslim and Jewish inhabitants. This victory established the Latin Kingdom of Jerusalem and marked the high-water mark of Crusader success, planting a European colony in the heart of the Levant.
+            </div>
+            <div class="mt-auto flex gap-2 flex-wrap">
+                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
+                    Read More / Source
+                </button>
+            </div>
+            <div class="modal-data hidden">
+                <div class="modal-more-info">
+                    <p>[Additional 1-2 paragraphs for Jerusalem go here.]</p>
+                </div>
+                <div class="modal-primary-source mt-6">
+                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
+                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
+                        "[Primary source quote for Jerusalem goes here.]"
+                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Fall of Edessa -->
+        <div class="timeline-card">
+            <img src="https://i.postimg.cc/vTqWGdFT/the-fall-of-edessa.jpg" alt="Fall of Edessa" class="card-image" onerror="this.src='https://placehold.co/400x300/1e2 ubiqub/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+            <div class="card-date">1144 CE</div>
+            <div class="card-title">The Fall of Edessa</div>
+            <div class="card-description">
+                Zangi, the Turkish atabeg of Mosul, captured Edessa, the first of the Crusader states to fall. This reversal shocked Europe, triggering the Second Crusade and signaling the beginning of a unified Muslim counter-response.
+            </div>
+            <div class="mt-auto flex gap-2 flex-wrap">
+                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
+                    Read More / Source
+                </button>
+            </div>
+            <div class="modal-data hidden">
+                <div class="modal-more-info">
+                    <p>[Additional 1-2 paragraphs for Edessa go here.]</p>
+                </div>
+                <div class="modal-primary-source mt-6">
+                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
+                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
+                        "[Primary source quote for Edessa goes here.]"
+                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Battle of Hattin -->
+        <div class="timeline-card">
+            <img src="https://i.postimg.cc/sgvJDmcr/Horns-of-Hattin-1.jpg" alt="Battle of Hattin" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+            <div class="card-date">1187 CE</div>
+            <div class="card-title">The Battle of Hattin</div>
+            <div class="card-description">
+                Saladin (Salah al-Din) lured the Crusader army into a waterless trap near the Horns of Hattin, destroying their forces and capturing the King of Jerusalem. This decisive victory enabled Saladin to retake Jerusalem, effectively ending the First Crusade and shifting the balance of power permanently back in favor of the Muslims.
+            </div>
+            <div class="mt-auto flex gap-2 flex-wrap">
+                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
+                    Read More / Source
+                </button>
+            </div>
+            <div class="modal-data hidden">
+                <div class="modal-more-info">
+                    <p>[Additional 1-2 paragraphs for Hattin go here.]</p>
+                </div>
+                <div class="modal-primary-source mt-6">
+                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
+                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
+                        "[Primary source quote for Hattin goes here.]"
+                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ERA 2 EVENTS -->
+    <div data-era-group="era2">
+        <!-- 6. The Third Crusade -->
+        <div class="timeline-card">
+            <img src="https://i.postimg.cc/QxWt8W7D/048c3cd42d27d3bf266c7a8419cbae42.webp" alt="The Third Crusade" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+            <div class="card-date">1189-1192 CE</div>
+            <div class="card-title">The Third Crusade</div>
+            <div class="card-description">
+                Known as the "King's Crusade," this campaign pitted Richard the Lionheart against Saladin. Despite military successes for the Crusaders, they failed to retake Jerusalem, ending in a truce that allowed unarmed Christian pilgrims access to the city but left it in Muslim hands.
+            </div>
+            <div class="mt-auto flex gap-2 flex-wrap">
+                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
+                    Read More / Source
+                </button>
+            </div>
+            <div class="modal-data hidden">
+                <div class="modal-more-info">
+                    <p>[Additional 1-2 paragraphs for the Third Crusade go here.]</p>
+                </div>
+                <div class="modal-primary-source mt-6">
+                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
+                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
+                        "[Primary source quote for the Third Crusade goes here.]"
+                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 7. Sack of Constantinople -->
+        <div class="timeline-card">
+            <img src="https://i.postimg.cc/L64p7F85/Sack-of-Constantinople.png" alt="The Sack of Constantinople" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+            <div class="card-date">1204 CE</div>
+            <div class="card-title">The Sack of Constantinople</div>
+            <div class="card-description">
+                In a shocking turn, the Fourth Crusade diverted from the Holy Land to sack the Christian city of Constantinople. This betrayal fatally weakened the Byzantine Empire, widened the schism between Catholic and Orthodox churches, and exposed the movement's shift from piety to plunder.
+            </div>
+            <div class="mt-auto flex gap-2 flex-wrap">
+                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
+                    Read More / Source
+                </button>
+            </div>
+            <div class="modal-data hidden">
+                <div class="modal-more-info">
+                    <p>[Additional 1-2 paragraphs for Constantinople go here.]</p>
+                </div>
+                <div class="modal-primary-source mt-6">
+                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
+                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
+                        "[Primary source quote for Constantinople goes here.]"
+                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. Treaty of Jaffa -->
+        <div class="timeline-card">
+            <img src="https://i.postimg.cc/x8T4sY3G/463061.jpg" alt="The Treaty of Jaffa" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+            <div class="card-date">1229 CE</div>
+            <div class="card-title">The Treaty of Jaffa</div>
+            <div class="card-description">
+                Holy Roman Emperor Frederick II regained control of Jerusalem not through war, but through a diplomatic treaty with the Ayyubid Sultan al-Kamil. This decade-long truce demonstrated that pragmatism could occasionally prevail over religious zealotry, although it was condemned by the Pope.
+            </div>
+            <div class="mt-auto flex gap-2 flex-wrap">
+                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
+                    Read More / Source
+                </button>
+            </div>
+            <div class="modal-data hidden">
+                <div class="modal-more-info">
+                    <p>[Additional 1-2 paragraphs for Jaffa go here.]</p>
+                </div>
+                <div class="modal-primary-source mt-6">
+                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
+                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
+                        "[Primary source quote for Jaffa goes here.]"
+                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 9. The Seventh Crusade -->
+        <div class="timeline-card">
+            <img src="https://i.postimg.cc/J4sTtpTp/the-seventh-crusade.jpg" alt="The Seventh Crusade" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+            <div class="card-date">1249-1250</div>
+            <div class="card-title">The Seventh Crusade</div>
+            <div class="card-description">
+                King Louis IX's invasion of Egypt aimed to decapitate Ayyubid power but ended in his capture at Al-Mansurah. This disaster catalyzed the rise of the Mamluk Sultanate, shifting the regional power dynamic toward a new, more militarized Muslim leadership that would ultimately doom the Crusader states.
+            </div>
+            <div class="mt-auto flex gap-2 flex-wrap">
+                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
+                    Read More / Source
+                </button>
+            </div>
+            <div class="modal-data hidden">
+                <div class="modal-more-info">
+                    <p>[Additional 1-2 paragraphs for the Seventh Crusade go here.]</p>
+G                </div>
+                <div class="modal-primary-source mt-6">
+                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
+                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
+                        "[Primary source quote for the Seventh Crusade goes here.]"
+                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 10. Battle of Ayn Jalut -->
+        <div class="timeline-card">
+            <img src="https://i.postimg.cc/tTm3jjHN/jalut.webp" alt="Battle of Ayn Jalut" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+            <div class="card-date">1260 CE</div>
+            <div class="card-title">The Battle of Ayn Jalut</div>
+            <div class="card-description">
+                The Mamluk Sultanate of Egypt defeated the Mongol army in Galilee, marking the first major defeat for the Mongols in the region. This victory halted their westward expansion, preserved Egypt as a Muslim power, and positioned the Mamluks as the new defenders of the faith.
+            </div>
+            <div class="mt-auto flex gap-2 flex-wrap">
+                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
+                    Read More / Source
+                </button>
+            </div>
+            <div class="modal-data hidden">
+                <div class="modal-more-info">
+                    <p>[Additional 1-2 paragraphs for Ayn Jalut go here.]</p>
+                </div>
+                <div class="modal-primary-source mt-6">
+                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
+                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
+                        "[Primary source quote for Ayn Jalut goes here.]"
+                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ERA 3 EVENTS -->
+    <div data-era-group="era3">
+        <!-- 11. Fall of Acre -->
+        <div class="timeline-card">
+            <img src="https://i.postimg.cc/G3VVCBrF/the-Fall-of-acrre.jpg" alt="Fall of Acre" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+            <div class="card-date">1291 CE</div>
+            <div class="card-title">The Fall of Acre</div>
+            <div class="card-description">
+                The Mamluks stormed Acre, the last major Crusader stronghold, driving the "Franj" into the sea. This marked the definitive end of the European military presence in the Levant, closing the era of the Crusades but leaving behind a militarized and suspicious Islamic world.
+            </div>
+            <div class="mt-auto flex gap-2 flex-wrap">
+                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
+                    Read More / Source
+                </button>
+            </div>
+            <div class="modal-data hidden">
+                <div class="modal-more-info">
+                    <p>[Additional 1-2 paragraphs for Acre go here.]</p>
+                </div>
+                <div class="modal-primary-source mt-6">
+                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
+                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
+                        "[Primary source quote for Acre goes here.]"
+                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+
+        <!-- 12. Rise of Osman Ghazi -->
+        <div class="timeline-card">
+            <img src="https://i.postimg.cc/Hkp2DHJV/Kurulus-Osman-1.jpg" alt="Rise of Osman Ghazi" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+            <div class="card-date">1299 CE</div>
+            <div class="card-title">The Rise of Osman Ghazi</div>
+            <div class="card-description">
+                From the anarchic frontier left by the Crusades and Mongol invasions, Osman Ghazi forged a new state dedicated to ghaza (holy war). This militarized principality would grow into the Ottoman Empire—a direct political response to the power vacuums of the era.
+            </div>
+            <div class="mt-auto flex gap-2 flex-wrap">
+                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
+                    Read More / Source
+                </button>
+            </div>
+            <div class="modal-data hidden">
+                <div class="modal-more-info">
+                    <p>[Additional 1-2 paragraphs for Osman Ghazi go here.]</p>
+                </div>
+                <div class="modal-primary-source mt-6">
+                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
+                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
+                        "[Primary source quote for Osman Ghazi goes here.]"
+                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+
+        <!-- 13. Fall of Constantinople -->
+        <div class="timeline-card">
+            <img src="https://i.postimg.cc/yd5Qs5q6/Fall-of-Constatinople.jpg" alt="Fall of Constantinople" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+            <div class="card-date">1453 CE</div>
+            <div class="card-title">The Fall of Constantinople</div>
+            <div class="card-description">
+                The Ottoman conquest of Constantinople was the final death knell of the Byzantine Empire, which had been fatally weakened centuries earlier by the Fourth Crusade. Mehmed II's victory fulfilled the Islamic dream of toppling the "New Rome," cementing the Ottomans as the new superpower.
+            </div>
+            <div class="mt-auto flex gap-2 flex-wrap">
+                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
+                    Read More / Source
+                </button>
+            </div>
+            <div class="modal-data hidden">
+                <div class="modal-more-info">
+                    <p>[Additional 1-2 paragraphs for the Fall of Constantinople go here.]</p>
+                </div>
+                <div class="modal-primary-source mt-6">
+                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
+                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
+                        "[Primary source quote for the Fall of Constantinople goes here.]"
+                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+
+        <!-- 14. Fall of Granada -->
+        <div class="timeline-card">
+            <img src="https://i.postimg.cc/50qyVcQH/the-Fall-of-Grenada.jpg" alt="Fall of Granada" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+            <div class="card-date">1492 CE</div>
+            <div class="card-title">The Fall of Granada</div>
+            <div class="card-description">
+                In the same year that Columbus sailed, the Catholic Monarchs Ferdinand and Isabella conquered Granada, the last Muslim stronghold on the Iberian Peninsula. This victory marked the violent conclusion of the Reconquista, ending nearly 800 years of Muslim presence in Al-Andalus and consolidating a militant, crusading Catholic Spain that would soon turn its aggression toward the New World.
+            </div>
+            <div class="mt-auto flex gap-2 flex-wrap">
+                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
+                    Read More / Source
+                </button>
+            </div>
+            <div class="modal-data hidden">
+                <div class="modal-more-info">
+                    <p>[Additional 1-2 paragraphs for Granada go here.]</p>
+                </div>
+                <div class="modal-primary-source mt-6">
+                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
+                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
+                        "[Primary source quote for Granada goes here.]"
+                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+
+        <!-- 15. Age of Discovery (Vasco da Gama) -->
+        <div class="timeline-card">
+            <img src="https://i.postimg.cc/5Npzzz08/Vasco-de-Gama.webp" alt="Age of Discovery (Vasco da Gama)" class="card-image" onerror="this.src='https://placehold.co/400x300/1e293b/f1f5f9?text=Image+Not+Found'; this.onerror=null;">
+            <div class="card-date">1498 CE</div>
+            <div class="card-title">The Age of Discovery (Vasco da Gama)</div>
+            <div class="card-description">
+                Blocked by the hostile "Muslim Lake" of the Ottoman and Mamluk empires—a geopolitical legacy of the Crusades—European powers were compelled to seek alternative sea routes to the East. Vasco da Gama's arrival in India marked the beginning of European colonial imperialism, a direct economic "blowback" from the failure to hold the Holy Land.
+            </div>
+            <div class="mt-auto flex gap-2 flex-wrap">
+                <button class="text-xs bg-red-800 text-red-100 px-3 py-1 rounded-full hover:bg-red-700 transition-colors open-modal-btn">
+                    Read More / Source
+                </button>
+            </div>
+            <div class="modal-data hidden">
+                <div class="modal-more-info">
+                    <p>[Additional 1-2 paragraphs for Vasco da Gama go here.]</p>
+                </div>
+                <div class="modal-primary-source mt-6">
+                    <h4 class="font-bold text-slate-200 text-lg mb-2" style="font-family: var(--font-theme);">Primary Source</h4>
+                    <blockquote class="border-l-4 border-slate-500 pl-4 italic text-slate-300">
+                        "[Primary source quote for Vasco daGama goes here.]"
+                        <cite class="block not-italic text-slate-400 mt-2">— [Source Name]</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+    </div> <!-- End Era 3 -->
+
+</div> <!-- End Event Data Store -->
+
+
+</div> <!-- End Overlay -->
+    
+
+<!-- Dark Theme Modal -->
+<div id="gemini-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden transition-opacity duration-300" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="bg-slate-900 rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col border border-slate-700">
+            
+            <div class="flex justify-between items-center p-4 border-b border-slate-700">
+                <h3 id="modal-title" class="text-lg font-semibold text-slate-100">Modal Title</h3>
+                <button id="modal-close-btn" class="text-gray-400 hover:text-gray-100" aria-label="Close modal">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0, 0, 24, 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div id="modal-content" class="p-6 overflow-y-auto prose prose-slate prose-invert max-w-none">
+                <!-- Content will be injected here by JS -->
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        // --- Modal Control ---
+        const modal = document.getElementById('gemini-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalContent = document.getElementById('modal-content');
+        const closeModalBtn = document.getElementById('modal-close-btn');
+
+        function showModal(title, htmlContent) {
+            modalTitle.textContent = title;
+            modalContent.innerHTML = htmlContent;
+            modal.classList.remove('hidden');
+        }
+
+        function hideModal() {
+            modal.classList.add('hidden');
+        }
+
+        // Close modal listeners
+        closeModalBtn.addEventListener('click', hideModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                hideModal();
+            }
+        });
+
+        // --- New Timeline Logic ---
+        
+        const eraTimeline = document.getElementById('era-timeline');
+        const subTimeline = document.getElementById('sub-timeline');
+        const subTimelineTitle = document.getElementById('sub-timeline-title');
+        const subTimelineEvents = document.getElementById('sub-timeline-events');
+        const eventDataStore = document.getElementById('event-data-store');
+
+        // --- New Scroll Button Logic ---
+        const scrollLeftBtn = document.getElementById('scroll-left-btn');
+        const scrollRightBtn = document.getElementById('scroll-right-btn');
+        const cardWidth = 320 + 16; // 320px card + 16px (1rem) margin
+
+        scrollLeftBtn.addEventListener('click', () => {
+            subTimelineEvents.scrollBy({ left: -cardWidth, behavior: 'smooth' });
+        });
+
+        scrollRightBtn.addEventListener('click', () => {
+            subTimelineEvents.scrollBy({ left: cardWidth, behavior: 'smooth' });
+        });
+        // --- End New Scroll Button Logic ---
+
+        // Listen for clicks on the Era cards
+        eraTimeline.addEventListener('click', (e) => {
+            const eraCard = e.target.closest('.era-card'); // Fixed: was '.era.card'
+            if (!eraCard) return;
+
+            const eraId = eraCard.dataset.era;
+            const eraTitle = eraCard.dataset.title;
+            const eventGroup = eventDataStore.querySelector(`[data-era-group="${eraId}"]`);
+
+            // Remove 'selected' from all other era cards
+            eraTimeline.querySelectorAll('.era-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            // Add 'selected' to the clicked card
+            eraCard.classList.add('selected');
+
+            if (eventGroup) {
+                // Set the title and content for the sub-timeline
+                subTimelineTitle.textContent = eraTitle;
+                subTimelineEvents.innerHTML = eventGroup.innerHTML;
+                
+                // Show the sub-timeline
+                subTimeline.classList.remove('hidden');
+
+                // Reset scroll position when changing eras
+                subTimelineEvents.scrollLeft = 0;
+            }
+        });
+
+        // Listen for "Read More" clicks on the *sub-timeline*
+        subTimelineEvents.addEventListener('click', (e) => {
+            const target = e.target;
+            
+            if (target.classList.contains('open-modal-btn')) {
+                const eventCard = target.closest('.timeline-card');
+                if (!eventCard) return;
+
+                const title = eventCard.querySelector('.card-title').textContent;
+                const modalDataEl = eventCard.querySelector('.modal-data');
+                
+                if (modalDataEl) {
+                    showModal(title, modalDataEl.innerHTML);
+                } else {
+                    showModal(title, "<p>Content for this section is not available yet.</p>");
+                }
+            }
+        });
+
+    </script>
+
+</body>
+</html>
