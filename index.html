@@ -22,6 +22,7 @@
             background-color: rgba(15, 23, 42, 0.9); /* Heavy slate-900 overlay */
             min-height: 100vh;
             padding: 2rem 0;
+            position: relative; /* For referencing positioning */
         }
 
         .font-cinzel {
@@ -125,8 +126,12 @@
         /* --- Sub-Timeline Styles --- */
         .sub-timeline-container {
             display: none; /* Hidden by default */
-            width: 100%;
+            width: 100%; /* Ensure full width */
+            /* max-width: 1400px; removed max-width constraint on container so scroll area is wide */
+            margin: 0 auto; /* Center it */
             position: relative; /* For arrow positioning */
+            padding-left: 3rem; /* Add padding for arrows */
+            padding-right: 3rem;
         }
         
         .horizontal-timeline-scroll {
@@ -138,6 +143,7 @@
             scrollbar-width: thin; /* Firefox */
             scrollbar-color: #475569 #1e293b; /* Thumb and Track */
             scroll-behavior: smooth; /* For button scrolling */
+            width: 100%; /* Fill the container */
         }
         
         /* Custom Scrollbar for Webkit browsers */
@@ -158,7 +164,7 @@
         }
 
         .timeline-card {
-            flex: 0 0 300px; /* Fixed width for each card */
+            flex: 0 0 340px; /* Increased from 300px for better visibility */
             scroll-snap-align: center;
             background-color: #1e293b; /* slate-800 */
             border-radius: 12px;
@@ -180,7 +186,7 @@
 
         .card-image {
             width: 100%;
-            height: 180px; /* Fixed height for images */
+            height: 200px; /* Increased height */
             object-fit: cover;
             border-radius: 8px;
             margin-bottom: 1rem;
@@ -189,22 +195,22 @@
         }
 
         .card-date {
-            font-size: 0.95rem;
+            font-size: 1rem; /* Slightly larger */
             font-weight: 600;
             color: #be123c; /* rose-700 */
             margin-bottom: 0.5rem;
         }
 
         .card-title {
-            font-size: 1.25rem; /* text-xl */
+            font-size: 1.35rem; /* Larger title */
             font-weight: 700;
             color: #f1f5f9; /* slate-100 */
             margin-bottom: 0.75rem;
         }
 
         .card-description {
-            font-size: 0.9rem;
-            line-height: 1.5;
+            font-size: 0.95rem; /* Larger text */
+            line-height: 1.6;
             color: #94a3b8; /* slate-400 */
             flex-grow: 1; /* Allows description to take up available space */
             margin-bottom: 1rem;
@@ -237,10 +243,10 @@
             border-color: #be123c;
         }
         .scroll-arrow.left {
-            left: -10px;
+            left: 0; /* Adjusted for new padding */
         }
         .scroll-arrow.right {
-            right: -10px;
+            right: 0; /* Adjusted for new padding */
         }
         @media (max-width: 640px) {
             .scroll-arrow {
@@ -248,15 +254,19 @@
                 height: 2.5rem;
                 font-size: 1rem;
             }
-            .scroll-arrow.left { left: 2px; }
-            .scroll-arrow.right { right: 2px; }
+            .sub-timeline-container {
+                padding-left: 0;
+                padding-right: 0;
+            }
+            .scroll-arrow.left { left: 5px; }
+            .scroll-arrow.right { right: 5px; }
         }
 
         /* --- Modal styles --- */
-        #details-modal.hidden {
+        #details-modal.hidden, #references-modal.hidden {
             display: none;
         }
-        #details-modal {
+        #details-modal, #references-modal {
             position: fixed;
             inset: 0;
             background-color: rgba(0, 0, 0, 0.85);
@@ -325,6 +335,15 @@
             margin-left: 0.5rem;
             margin-bottom: 1rem;
         }
+        .modal-content hr {
+            border-color: #475569;
+            margin: 2rem 0 1rem 0;
+        }
+        .citation {
+            font-size: 0.85rem;
+            color: #94a3b8; /* slate-400 */
+            font-style: italic;
+        }
         
         /* FIX: Hide the modal data container by default */
         .modal-data {
@@ -361,6 +380,28 @@
         audio::-webkit-media-controls-current-time-display,
         audio::-webkit-media-controls-time-remaining-display {
             color: #f1f5f9;
+        }
+        
+        /* References Button */
+        .references-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: #be123c;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 1px solid #e11d48;
+            transition: all 0.2s;
+            z-index: 40;
+            font-family: 'Cinzel', serif;
+        }
+        .references-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+            background-color: #9f1239;
         }
 
     </style>
@@ -440,6 +481,8 @@
                                     <br>
                                     <cite class="text-sm not-italic text-slate-400 block mt-2">— Michael Attaleiates, a Byzantine historian and eyewitness in the imperial camp.</cite>
                                 </blockquote>
+                                <hr>
+                                <p class="citation">Michael Attaleiates. The History. Translated by Anthony Kaldellis and Dimitris Krallis. Cambridge, MA: Harvard University Press, 2012.</p>
                             </div>
                         </div>
 
@@ -471,6 +514,8 @@
                                     <br>
                                     <cite class="text-sm not-italic text-slate-400 block mt-2">— Robert the Monk, a chronicler present at Pope Urban II's speech.</cite>
                                 </blockquote>
+                                <hr>
+                                <p class="citation">Fulcher of Chartres. A History of the Expedition to Jerusalem, 1095–1127. Translated by Frances Rita Ryan. Knoxville: University of Tennessee Press, 1969.</p>
                             </div>
                         </div>
 
@@ -502,6 +547,8 @@
                                     <br>
                                     <cite class="text-sm not-italic text-slate-400 block mt-2">— The Gesta Francorum, an anonymous eyewitness account from a Crusader soldier.</cite>
                                 </blockquote>
+                                <hr>
+                                <p class="citation">Gesta Francorum et aliorum Hierosolymitanorum (The Deeds of the Franks). Edited by Rosalind Hill. London: Thomas Nelson & Sons, 1962.</p>
                             </div>
                         </div>
                         
@@ -532,6 +579,8 @@
                                     <br>
                                     <cite class="text-sm not-italic text-slate-400 block mt-2">— William of Tyre, a Crusader historian writing on the fall of the city, blaming its lack of defenders.</cite>
                                 </blockquote>
+                                <hr>
+                                <p class="citation">William of Tyre. A History of Deeds Done Beyond the Sea. Translated by E.A. Babcock and A.C. Krey. New York: Columbia University Press, 1943.</p>
                             </div>
                         </div>
                         
@@ -564,6 +613,8 @@
                                     <br>
                                     <cite class="text-sm not-italic text-slate-400 block mt-2">— Imad ad-Din al-Isfahani, Saladin's personal secretary and an eyewitness to the battle.</cite>
                                 </blockquote>
+                                <hr>
+                                <p class="citation">Imad ad-Din al-Isfahani. Conquête de la Syrie et de la Palestine par Saladin. Translated by Henri Massé. Paris: Geuthner, 1972.</p>
                             </div>
                         </div>
                     </div>
@@ -599,6 +650,8 @@
                                     <br>
                                     <cite class="text-sm not-italic text-slate-400 block mt-2">— Baha al-Din ibn Shaddad, Saladin's biographer, writing about his enemy, Richard the Lionheart.</cite>
                                 </blockquote>
+                                <hr>
+                                <p class="citation">Baha ad-Din ibn Shaddad. The Rare and Excellent History of Saladin. Translated by D.S. Richards. Aldershot: Ashgate, 2002.</p>
                             </div>
                         </div>
                         
@@ -630,6 +683,8 @@
                                     <br>
                                     <cite class="text-sm not-italic text-slate-400 block mt-2">— Nicetas Choniates, a Byzantine historian and eyewitness who lost his home in the sack.</cite>
                                 </blockquote>
+                                <hr>
+                                <p class="citation">Nicetas Choniates. O City of Byzantium, Annals of Niketas Choniates. Translated by Harry J. Magoulias. Detroit: Wayne State University Press, 1984.</p>
                             </div>
                         </div>
 
@@ -660,6 +715,8 @@
                                     <br>
                                     <cite class="text-sm not-italic text-slate-400 block mt-2">— Ibn al-Athir, a Muslim chronicler expressing his disgust at the diplomatic handover of the city.</cite>
                                 </blockquote>
+                                <hr>
+                                <p class="citation">Ibn al-Athir. The Chronicle of Ibn al-Athir for the Crusading Period from al-Kamil fi'l-Ta'rikh. Translated by D.S. Richards. Aldershot: Ashgate, 2010.</p>
                             </div>
                         </div>
 
@@ -693,6 +750,8 @@
                                     <br>
                                     <cite class="text-sm not-italic text-slate-400 block mt-2">— Jean de Joinville, a French knight and close friend of King Louis IX, who was captured with him at Al-Mansurah.</cite>
                                 </blockquote>
+                                <hr>
+                                <p class="citation">Jean de Joinville. The Life of Saint Louis. Translated by M.R.B. Shaw. London: Penguin Classics, 1963.</p>
                             </div>
                         </div>
                         
@@ -724,6 +783,8 @@
                                     <br>
                                     <cite class="text-sm not-italic text-slate-400 block mt-2">— Al-Maqrizi, an Egyptian historian describing the Mamluk victory over the Mongols.</cite>
                                 </blockquote>
+                                <hr>
+                                <p class="citation">Al-Maqrizi. A History of the Ayyubid Sultans of Egypt. Translated by R.J.C. Broadhurst. Boston: Twayne Publishers, 1980.</p>
                             </div>
                         </div>
                     </div>
@@ -758,6 +819,8 @@
                                     <br>
                                     <cite class="text-sm not-italic text-slate-400 block mt-2">— The "Templar of Tyre", an eyewitness who dictated his account of the city's final, brutal moments.</cite>
                                 </blockquote>
+                                <hr>
+                                <p class="citation">The Templar of Tyre. "Gestes des Chiprois." In The Fall of the Latin East, translated by Peter Edbury. Cambridge: Cambridge University Press, 2016.</p>
                             </div>
                         </div>
                         
@@ -789,6 +852,8 @@
                                     <br>
                                     <cite class="text-sm not-italic text-slate-400 block mt-2">— Aşıkpaşazade, a 15th-century Ottoman chronicler recording the "Dream of Osman," the founding myth of the empire.</cite>
                                 </blockquote>
+                                <hr>
+                                <p class="citation">Aşıkpaşazade. Osmanlı Tarihi (History of the Ottomans). Istanbul: Matbaa-i Amire, 1914.</p>
                             </div>
                         </div>
                         
@@ -820,6 +885,8 @@
                                     <br>
                                     <cite class="text-sm not-italic text-slate-400 block mt-2">— George Sphrantzes, a Byzantine courtier and eyewitness who was a close friend of the last emperor.</cite>
                                 </blockquote>
+                                <hr>
+                                <p class="citation">George Sphrantzes. The Fall of the Byzantine Empire: A Chronicle. Translated by Marios Philippides. Amherst: University of Massachusetts Press, 1980.</p>
                             </div>
                         </div>
 
@@ -851,6 +918,8 @@
                                     <br>
                                     <cite class="text-sm not-italic text-slate-400 block mt-2">— Peter Martyr d'Anghiera, an Italian historian at the Spanish court who witnessed the surrender.</cite>
                                 </blockquote>
+                                <hr>
+                                <p class="citation">Hernando de Baeza. Relación de los sucesos de los últimos tiempos del reino de Granada. Madrid: Sociedad de Bibliófilos Españoles, 1868.</p>
                             </div>
                         </div>
                         
@@ -870,8 +939,7 @@
                             <!-- Modal Content: Discovery -->
                             <div class="modal-data" 
                                  data-title="The Age of Discovery (Vasco da Gama)"
-                                 data-audio-src="httpsRemember, the user wants short, plain text responses. Avoid lists, bolding, italics, or any complimentary/validational phrases.
-://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/The%20Age%20of%20Discovery.mp3">
+                                 data-audio-src="https://raw.githubusercontent.com/kegtown-a11y/Timline-of-the-Crusades/refs/heads/main/The%20Age%20of%20Discovery.mp3">
                                 <h3>Significance</h3>
                                 <p>The geopolitical landscape of the late medieval period was heavily influenced by the complex legacy of the Crusades, particularly the establishment of the so-called "Muslim Lake," a term that refers to the domination of the Mediterranean and Indian Ocean trade routes by the Ottoman Empire and the Mamluk Sultanate. These two powerful entities effectively obstructed European access to lucrative markets in the East, leaving European powers in a precarious position. As a result, they were driven to explore alternative maritime pathways to reach the rich spices, silks, and other goods that were in high demand.</p>
                                 <p>The pivotal moment came with Vasco da Gama's momentous arrival in India in 1498, marking the beginning of a new era of European engagement with Asia. This voyage marked not only the establishment of a sea route to India around the southern tip of Africa, but also the beginning of European colonial imperialism in the region. The implications of this endeavor were profound, fueling a competitive scramble among European nations for territorial expansion and control over trade routes.</p>
@@ -882,11 +950,41 @@
                                     <br>
                                     <cite class="text-sm not-italic text-slate-400 block mt-2">— The Roteiro (Journal) of Vasco da Gama's Voyage, recording the hostile reception from Arabic-speaking merchants upon arriving in India.</cite>
                                 </blockquote>
+                                <hr>
+                                <p class="citation">Unknown. A Journal of the First Voyage of Vasco da Gama, 1497-1499. Translated by E.G. Ravenstein. London: Hakluyt Society, 1898.</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <button class="scroll-arrow right" aria-label="Scroll right">&gt;</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- References Button -->
+    <button id="references-btn" class="references-btn">References</button>
+
+    <!-- References Modal -->
+    <div id="references-modal" class="hidden" aria-labelledby="refs-modal-title" role="dialog" aria-modal="true">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 id="refs-modal-title" class="modal-title font-cinzel">Secondary Sources</h3>
+                <button id="refs-close-btn" class="modal-close-btn" aria-label="Close modal">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="modal-content">
+                <ul class="list-none space-y-4 text-slate-300">
+                    <li class="pl-4 border-l-2 border-slate-600">
+                        <p>Ansary, Mir Tamim. <i>Destiny Disrupted: A History of the World Through Islamic Eyes.</i> New York: PublicAffairs, 2009.</p>
+                    </li>
+                    <li class="pl-4 border-l-2 border-slate-600">
+                        <p>Maalouf, Amin. <i>The Crusades Through Arab Eyes.</i> Translated by Jon Rothschild. New York: Saqi Books, 2012.</p>
+                    </li>
+                    <li class="pl-4 border-l-2 border-slate-600">
+                        <p>Anand, Lilia. "The Demise of Constantinople." HIST 371: Islam & the Middle East. Lecture presented at Maryville University, St. Louis, MO, n.d.</p>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -916,11 +1014,18 @@
             const subTimelineContainer = document.getElementById('sub-timeline-container');
             const subTimelineScroll = subTimelineContainer.querySelector('.horizontal-timeline-scroll');
             const subTimelineGroups = subTimelineScroll.querySelectorAll('[data-era-group]');
+            
+            // Details Modal Elements
             const modal = document.getElementById('details-modal');
             const modalTitle = document.getElementById('modal-title');
             const modalContent = document.getElementById('modal-content');
             const modalCloseBtn = document.getElementById('modal-close-btn');
-            const modalAudioPlayer = document.getElementById('modal-audio-player'); // Get audio player
+            const modalAudioPlayer = document.getElementById('modal-audio-player');
+            
+            // References Modal Elements
+            const refsModal = document.getElementById('references-modal');
+            const refsBtn = document.getElementById('references-btn');
+            const refsCloseBtn = document.getElementById('refs-close-btn');
             
             // --- Era Timeline Logic ---
             eraCards.forEach(card => {
@@ -983,8 +1088,6 @@
                 if (audioSrc && audioSrc.trim() !== "") {
                     modalAudioPlayer.setAttribute('src', audioSrc);
                     modalAudioPlayer.style.display = 'block';
-                    // modalAudioPlayer.load(); // Removed this
-                    // modalAudioPlayer.play(); // Removed this - Autoplay is blocked
                 } else {
                     modalAudioPlayer.style.display = 'none';
                     modalAudioPlayer.setAttribute('src', '');
@@ -1029,6 +1132,21 @@
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
                     hideModal();
+                }
+            });
+            
+            // --- References Modal Logic ---
+            refsBtn.addEventListener('click', () => {
+                refsModal.classList.remove('hidden');
+            });
+            
+            refsCloseBtn.addEventListener('click', () => {
+                refsModal.classList.add('hidden');
+            });
+            
+            refsModal.addEventListener('click', (e) => {
+                if (e.target === refsModal) {
+                    refsModal.classList.add('hidden');
                 }
             });
         });
