@@ -3,21 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Jurisprudence of Conditionality</title>
+    <title>Interactive Timeline Analysis</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
+        html {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: sans-serif;
+            font-family: 'Caveat', cursive;
+            font-size: 1.8rem; 
             background-color: #1a0f0a;
             background-image: url('https://i.postimg.cc/TPGbHvMj/Picsart-26-01-21-23-33-12-242.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            color: #1a0f0a;
+            
+            color: #ffffff;
+            -webkit-text-stroke: 0.3px rgba(0,0,0,0.8);
+            text-shadow: 
+                -1px -1px 0 #000,  
+                 1px -1px 0 #000,
+                -1px  1px 0 #000,
+                 1px  1px 0 #000,
+                 2px  2px 4px rgba(0,0,0,0.8);
+                 
             margin: 0;
-            height: 100vh;
+            padding: 0;
+            height: 100%; 
+            width: 100%;
             overflow: hidden;
+            zoom: 65%; 
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'EB Garamond', serif;
+            -webkit-text-stroke: 0; 
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
         }
 
         .glass-panel {
@@ -27,8 +56,9 @@
         }
         
         .dark-glass {
-            background-color: rgba(26, 15, 10, 0.75);
+            background-color: rgba(26, 15, 10, 0.85);
             backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 176, 119, 0.2);
         }
 
         .nav-scroll {
@@ -40,17 +70,25 @@
         }
 
         .nav-item {
-            flex: 0 0 240px;
-            background-color: rgba(217, 197, 178, 0.1);
+            flex: 0 0 220px;
+            background-color: rgba(217, 197, 178, 0.05);
             backdrop-filter: blur(4px);
             transition: all 0.3s ease;
             border-bottom: 6px solid transparent;
             margin: 0 0.75rem;
+            padding: 0.75rem;
+        }
+
+        .nav-item span {
+            font-family: 'EB Garamond', serif;
+            font-size: 1.3rem;
+            -webkit-text-stroke: 0;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
         }
 
         .nav-item.active {
-            border-bottom-color: #a35c27;
-            background-color: rgba(255, 255, 255, 0.2);
+            border-bottom-color: #ffb077;
+            background-color: rgba(255, 255, 255, 0.15);
         }
         
         .fade-in {
@@ -62,17 +100,17 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .report-view h2 { font-size: 2.25rem; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 2rem; color: #1a0f0a; font-weight: normal; }
-        .report-view h4 { font-weight: normal; text-transform: uppercase; letter-spacing: 0.15em; color: #4a2c1d; margin-top: 3.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(163, 92, 39, 0.25); padding-bottom: 0.5rem; }
-        .report-view hr { border: 0; border-top: 1px solid #a35c27; margin: 4rem 0; opacity: 0.2; }
+        .report-view h2 { font-size: clamp(2.5rem, 4vw, 3.5rem); line-height: 1.1; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 2rem; color: #ffffff; font-weight: normal; }
+        .report-view h4 { font-weight: normal; text-transform: uppercase; letter-spacing: 0.15em; color: #ffb077; margin-top: 4rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255, 176, 119, 0.3); padding-bottom: 0.5rem; font-size: 1.8rem; }
+        .report-view hr { border: 0; border-top: 1px solid rgba(255, 255, 255, 0.4); margin: 4rem 0; opacity: 0.5; }
         
         .image-overlay-container {
             position: relative;
             width: 100%;
-            border-radius: 2px;
+            border-radius: 4px;
             overflow: hidden;
-            background-color: rgba(0,0,0,0.15);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            background-color: rgba(0,0,0,0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
         .img-placeholder {
@@ -82,26 +120,9 @@
             background-position: center;
         }
 
-        table { width: 100%; border-collapse: collapse; margin: 2rem 0; background: rgba(255,255,255,0.02); }
-        th, td { border: 1px solid rgba(163, 92, 39, 0.2); padding: 1.25rem; text-align: left; font-size: 0.95rem; color: #1a0f0a; font-weight: normal; }
-        th { background: rgba(163, 92, 39, 0.05); text-transform: uppercase; color: #4a2c1d; letter-spacing: 0.05em; }
-
-        .slider-btn {
-            background-color: rgba(26, 15, 10, 0.6);
-            color: #d9c5b2;
-            width: 3rem;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            z-index: 40;
-            font-size: 1.5rem;
-        }
-        .slider-btn:hover {
-            background-color: #a35c27;
-            color: white;
-        }
+        table { width: 100%; border-collapse: collapse; margin: 2rem 0; background: rgba(0,0,0,0.2); }
+        th, td { border: 1px solid rgba(255, 255, 255, 0.2); padding: 1.25rem; text-align: left; color: #ffffff; font-weight: normal; font-size: 1.6rem; }
+        th { background: rgba(0, 0, 0, 0.4); text-transform: uppercase; color: #ffb077; letter-spacing: 0.05em; font-family: 'EB Garamond', serif; font-size: 1.2rem; -webkit-text-stroke: 0; }
 
         .chart-container {
             position: relative;
@@ -112,28 +133,130 @@
         }
     </style>
 </head>
-<body class="flex flex-col h-screen overflow-hidden text-left">
+<body class="flex flex-col text-left">
+
+    <header class="dark-glass text-[#d9c5b2] p-6 shadow-xl flex-none z-30">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div class="w-full text-center md:text-left">
+                <h1 class="text-4xl tracking-tighter uppercase font-light">The Jurisprudence of Conditionality</h1>
+            </div>
+            <button id="aboutBtn" class="mt-4 md:mt-0 px-6 py-2 bg-[#ffb077]/20 border border-[#ffb077] rounded-sm text-sm transition text-[#ffb077] uppercase tracking-widest hover:bg-[#ffb077]/40" style="-webkit-text-stroke: 0; font-family: 'EB Garamond', serif;">Introduction</button>
+        </div>
+    </header>
 
     <div class="flex flex-1 overflow-hidden relative flex-col">
         
-        <main id="mainDisplay" class="flex-1 overflow-y-auto p-6 md:p-16 bg-transparent">
-            <div id="introView" class="max-w-4xl mx-auto mt-12 text-left glass-panel p-16 rounded-sm shadow-2xl">
-                <h2 class="text-5xl text-[#1a0f0a] mb-10 font-light leading-tight">An Analysis of Key Changes in American Law and Their Lasting Social and Economic Effects.</h2>
-                <div class="space-y-8 text-xl text-[#261a15] leading-relaxed">
-                    <p>The evolution of civil liberties and political agency in the United States is often portrayed as a straightforward journey toward universal equality. However, when we take a deeper dive into the historical and legal landscape stretching from the mid-seventeenth century to today, we uncover a far more intricate and fluctuating narrative shaped by conditionality. This concept reflects the fragile nature of rights, granted or withheld, often dictated by economic needs, entrenched racial hierarchies, and the whims of political priorities.</p>
-                    <p>By delving into these pivotal historical events and drawing connections to their present-day consequences, we can illuminate the intricate interplay of law, power, and social justice in the United States. Through this lens, it becomes starkly apparent that the journey toward genuine inclusivity remains incomplete. There is still an urgent need for vigilance in dismantling the systemic inequities that have lingered for centuries.</p>
+        <main id="mainDisplay" class="flex-1 overflow-y-auto p-6 md:p-16 pb-[500px] bg-transparent relative z-10">
+            <div id="introView" class="max-w-4xl mx-auto mt-6 text-left glass-panel p-16 rounded-sm shadow-2xl">
+                <div class="image-overlay-container aspect-video mb-10 border border-white/20">
+                    <div class="img-placeholder" style="background-image: url('https://i.postimg.cc/CMzPW9sV/Main-Photo.png');"></div>
                 </div>
-                <button onclick="loadSection(0)" class="mt-12 px-12 py-5 bg-[#a35c27] text-white rounded-sm shadow-2xl hover:bg-[#8c3a1a] transition uppercase tracking-widest text-sm">Start Investigation</button>
+                <h2 class="text-5xl text-white mb-10 font-light leading-tight">The Evolution of Womens Suffrage and Its Enduring Ramifications</h2>
+                <div class="space-y-8 text-3xl leading-relaxed">
+                    <p>The trajectory of political enfranchisement and civil rights in the United States is frequently misinterpreted as a linear progression toward universal equality, characterized by steady moral enlightenment and the inevitable triumph of democratic ideals. However, a rigorous examination of the historical record reveals a far more complex and volatile reality. The expansion of citizenship and voting rights has been characterized by strategic concessions, systemic retrenchments, profound ideological schisms, and the continuous weaponization of the law. The fight for womens suffrage, intersecting inextricably with issues of race, class, and colonial power dynamics, serves as a critical analytical lens through which to view the broader evolution of American democratic institutions.</p>
+                    <p>The historical artifacts surrounding this movement ranging from early colonial legal demands to twentieth century legislative compromises demonstrate that the acquisition of rights has rarely been absolute. Instead, the granting of political agency has consistently been mediated by the prevailing interests of the patriarchal, racial, and economic hegemony. Rights have been granted when politically expedient, revoked when those political utilities expired, and severely restricted when they threatened to disrupt entrenched racial and economic hierarchies.</p>
+                    <p>This comprehensive research report provides an exhaustive synthesis of the historical timeline of womens suffrage rights and its ongoing modern day ramifications. By analyzing primary legislative texts, historical archives, and contemporary socioeconomic data, this analysis delineates the second and third order impacts of key historical milestones. Through this extensive review, a definitive pattern emerges: the legal mechanisms utilized to either grant or suppress womens rights have cast a long shadow, permanently shaping modern legal frameworks, the racial wealth gap, federal state administrative relationships, and contemporary battles over voter suppression.</p>
+                </div>
+                <button onclick="loadSection(0)" class="mt-12 px-12 py-5 bg-[#a35c27] text-white rounded-sm shadow-2xl hover:bg-[#8c3a1a] transition uppercase tracking-widest text-xl font-bold" style="font-family: 'EB Garamond', serif; text-shadow: none; -webkit-text-stroke: 0;">Start Investigation</button>
+                
+                <button onclick="document.getElementById('biblio').classList.toggle('hidden')" class="mt-12 ml-4 px-12 py-5 bg-transparent border border-[#a35c27] text-[#ffb077] rounded-sm shadow-2xl hover:bg-[#a35c27]/20 transition uppercase tracking-widest text-xl font-bold" style="font-family: 'EB Garamond', serif; text-shadow: none; -webkit-text-stroke: 0;">Bibliography</button>
+
+                <div id="biblio" class="hidden mt-12 text-2xl leading-relaxed space-y-4 text-gray-300 border-t border-white/20 pt-12">
+                    <p class="text-[#ffb077] mt-12 text-3xl">Colonial Powerplay: Margaret Brent's Most Audacious Demand</p>
+                    <p>Primary Source: Archives of Maryland (Biographical Series)</p>
+                    <p class="break-words">http://msa.maryland.gov/megafile/msa/speccol/sc3500/sc3520/002100/002177/html/collections.html</p>
+                    <p>This collection contains digitized primary source records from the Maryland General Assembly and provincial court (1640s onward), offering vital insights into early Maryland's legal and political landscape. It highlights Margaret Brent, a pioneering female figure, specifically her groundbreaking 1648 demand for a voice and two votes in the assembly—a remarkable assertion of political rights. These reliable primary sources are critical evidence for A Colonial Powerplay, allowing analysis of Brent's strategy as Governor Calvert's executor. Interpreting his directive to take all, and pay all, Brent used her position to challenge patriarchal legal and gender norms. This collection is essential for understanding gender, power, and law in colonial America, as well as the enduring impact of Brent's political legacy.</p>
+                    <p>Secondary Source: American Bar Association. Margaret Brent Women Lawyers of Achievement Awards.</p>
+                    <p class="break-words">https://www.americanbar.org/groups/diversity/women/margaret-brent-awards/</p>
+                    <p>This source details the history and purpose of the ABA's Margaret Brent Women Lawyers of Achievement Award, established to honor outstanding women lawyers. It offers a contemporary assessment of Margaret Brent, North America's first female lawyer, highlighting her groundbreaking legal and women's rights contributions. The timeline in the Modern-Day Ramifications section shows Brent's lasting impact. Her pioneering efforts, particularly her taxation without representation demand, challenged colonial gender norms and set a precedent for recognizing women's achievements in professional and political spheres today. The source argues that Brent's courage paved the way for future women lawyers and leaders, shaping gender equality in the legal profession and society.</p>
+
+                    <p class="text-[#ffb077] mt-12 text-3xl">Partus Sequitur Ventrem: The Law of Perpetual Bondage</p>
+                    <p>Primary Source: Virginia General Assembly. Negro women's children to serve according to the condition of the mother. Encyclopedia Virginia, 1662.</p>
+                    <p class="break-words">https://encyclopediavirginia.org/primary-documents/negro-womens-children-to-serve-according-to-the-condition-of-the-mother-1662/</p>
+                    <p>This doctrine entrenched matrilineal inheritance and profoundly impacted enslaved populations, linking race and reproduction to create a rigid racial hierarchy. The law penalized interracial relationships among Christians, deepening divisions and marginalizing Black individuals. Ultimately, this document is crucial for understanding how legal mechanisms absolved white male enslavers and commodified the reproductive capacity of enslaved Black women to expand wealth and perpetuate slavery.</p>
+                    <p>Secondary Source: Morgan, Jennifer L. Partus sequitur ventrem: Law, Race, and Reproduction in Colonial Slavery.</p>
+                    <p class="break-words">https://www.brookings.edu/articles/black-reparations-and-the-racial-wealth-gap/</p>
+                    <p>This secondary analysis provides the critical historical framework for examining the devastating effects of the 1662 statute. It is explicitly utilized in the timeline to highlight historian Jennifer L. Morgan's argument that this system of racial slavery ensnared enslaved women in a relentless cycle of heritability. The source supports the narrative's exploration of social death, detailing how the legal commodification of Black women's bodies alienated individuals from their families and transformed human reproduction into a grim engine for accumulating wealth.</p>
+                    <p>Secondary Source: Ray, Rashawn. Black reparations and the racial wealth gap. Brookings Institution.</p>
+                    <p class="break-words">https://www.brookings.edu/articles/black-reparations-and-the-racial-wealth-gap/</p>
+                    <p>This contemporary secondary source grounds the modern-day ramifications of the 1662 legislation in complex data. It directly supports the statistical arguments made in the timeline, specifically that Black Americans hold just 2.6 percent of the nation's wealth and face an $800,000 net worth gap compared to white households. By detailing how discriminatory practices compounded the initial cycle of unpaid labor, this source reinforces the project's argument that the legacy of partus sequitur ventrem continues to drive systemic inequality today.</p>
+
+                    <p class="text-[#ffb077] mt-12 text-3xl">The Schizmatic Suffragists: The Civil War Within the AERA</p>
+                    <p>Primary Source: National Archives and Records Administration. Woman Suffrage and the 19th Amendment. National Archives.</p>
+                    <p class="break-words">https://www.archives.gov/education/lessons/woman-suffrage</p>
+                    <p>This primary source repository houses the original congressional documents, petitions, and resolutions drafted by suffragists during the decades-long push for the vote. Following the AERA split, the rival suffrage factions utilized drastically different legislative strategies. This collection is essential for the timeline project because it provides the actual, digitized petitions and government records that demonstrate how the NWSA and AWSA campaigned and how they eventually had to reconcile their divided efforts to pressure Congress into passing a federal amendment.</p>
+                    <p>Secondary Source: Injustice in Intersectionality: Women's Suffrage Movement. Civil and Human Rights.</p>
+                    <p class="break-words">https://www.civilandhumanrights.org/injustice-in-intersectionality-womens-suffrage-movement/</p>
+                    <p>This secondary source examines the racial exclusionary tactics employed by white suffrage leaders during the movement's schism. It supports the narrative's focus on prominent Black suffragists, such as Frances Ellen Watkins Harper, who confronted white leaders at national conventions. The source bolsters the argument that while white suffragists fought for political rights, Black women were simultaneously battling existential wrongs and systemic daily violence.</p>
+                    <p>Secondary Source: #OurTimeNow: Seven Suffrage Lessons for Modern Feminists in America and beyond.</p>
+                    <p class="break-words">https://www.google.com/url?sa=E&source=gmail&q=https://www.fawcettsociety.org.uk/blog/ourtimenow-seven-suffrage-lessons-for-modern-feminists</p>
+                    <p>This contemporary source directly addresses the lasting fault line created by the 1869 divide. It is explicitly utilized in the Modern-Day Ramifications section to connect the historical schism to the necessity of intersectional feminism, a framework introduced by Kimberlé Crenshaw. The text uses this source to demonstrate how modern coalitions actively work against the legacy of exclusion by recognizing that women vote along varied intersectional lines—such as race, class, and region—rather than as a monolithic bloc.</p>
+
+                    <p class="text-[#ffb077] mt-12 text-3xl">Utah’s U-turn: Why Mormons Granted Universal Suffrage First</p>
+                    <p>Primary Source: The Church Historian's Press. 3.14 Female Suffrage in Utah, February 8, 1870. The First Fifty Years of Relief Society.</p>
+                    <p class="break-words">https://www.churchhistorianspress.org/the-first-fifty-years-of-relief-society/part-3/3-14?lang=eng</p>
+                    <p>This primary source provides crucial context regarding the enfranchisement of women in the Utah Territory. It supports the narrative that LDS women, such as Seraph Young, who voted in a Salt Lake City municipal election on February 14, 1870, were the first to legally vote under an equal suffrage law. The source is essential for the timeline to demonstrate how the LDS Church advocated for women's suffrage to double their political influence and create a barrier against federal anti-polygamy efforts spearheaded by reformers like George Julian.</p>
+                    <p>Secondary Source: National Park Service. Women's Suffrage in Utah. NPS.gov.</p>
+                    <p class="break-words">https://www.nps.gov/articles/000/women-s-suffrage-in-utah.htm</p>
+                    <p>This secondary source provides a comprehensive overview of the complex dynamic between the LDS Church and the federal government following the Civil War. It expands on the timeline's discussion of the 1887 Edmunds-Tucker Act, which revoked the voting rights of every woman in the territory to cripple the church financially and politically. In the Modern-Day Ramifications section, this historical context is used to explore the concept of conditional rights, warning that statutory rights used as political tools are precarious, and connecting this history to contemporary issues such as voter roll purges and partisan gerrymandering.</p>
+
+                    <p class="text-[#ffb077] mt-12 text-3xl">The Great War Against Dissent: The Espionage Act of 1917</p>
+                    <p>Primary Source: Espionage Act of 1917 (1917). The First Amendment Encyclopedia - Free Speech Center.</p>
+                    <p class="break-words">https://firstamendment.mtsu.edu/article/espionage-act-of-1917/</p>
+                    <p>This primary source provides the text of the legislation that criminalized disloyal or abusive language against the government. It is used in the timeline to contextualize the hostile political climate where the Wilson administration sought to silence dissent during World War I. The source grounds the narrative's discussion of the draconian measures used to target the Silent Sentinels. It provides the historical basis for the ongoing tension between national security and First Amendment rights.</p>
+                    <p>Secondary Source: National Park Service. National Woman's Party Protests During World War I. NPS.gov.</p>
+                    <p class="break-words">https://www.nps.gov/articles/national-womans-party-protests-world-war-i.htm</p>
+                    <p>This secondary source provides a detailed historical account of the National Woman's Party and its militant strategies, led by Alice Paul and Lucy Burns. It supports the project's recounting of the Silent Sentinels picketing the White House and the subsequent state-sanctioned brutality they faced at the Occoquan Workhouse during the Night of Terror. This source is crucial for illustrating how their non-violent civil disobedience exposed the administration's hypocrisy and ultimately forced President Wilson to endorse the 19th Amendment.</p>
+                    <p>Secondary Source: The Espionage Act's constitutional legacy. National Constitution Center.</p>
+                    <p class="break-words">https://constitutioncenter.org/blog/the-espionage-acts-constitutional-legacy</p>
+                    <p>This contemporary analysis explores the lasting legal impact of the 1917 Espionage Act, explicitly supporting the Modern-Day Ramifications section of the timeline. It connects the historical wartime restrictions, as justified by Justice Oliver Wendell Holmes in cases like Schenck v. United States, to contemporary issues. The text utilizes this source to show how the Department of Justice continues to invoke the Act to prosecute whistleblowers, highlighting the enduring tug-of-war between national defense and the right to protest.</p>
+
+                    <p class="text-[#ffb077] mt-12 text-3xl">A Dry Victory: Women’s Suffrage and the Start of Prohibition</p>
+                    <p>Primary Source: Stanton, Elizabeth Cady, Susan B. Anthony, Matilda Joslyn Gage, and Ida Husted Harper. Chapter 21: Michigan. History of Woman Suffrage, Volume 6. Wikisource.</p>
+                    <p class="break-words">https://en.m.wikisource.org/wiki/History_of_Woman_Suffrage/Volume_6/Chapter_21</p>
+                    <p>This primary source provides a firsthand account of the temperance and suffrage organizing within Michigan. It is explicitly used to highlight the grassroots efforts of local suffragists, such as Mrs. G.B. Jennison and Clara B. Arthur, who helped secure the state's prohibition law in May 1918. The source supports the narrative that women, through organizations like the WCTU, wielded their moral authority to combat domestic violence and pave the way for the 18th Amendment.</p>
+                    <p>Secondary Source: Michigan Goes Dry. Northern Michigan History.</p>
+                    <p class="break-words">https://northernmichiganhistory.com/michigan-goes-dry/</p>
+                    <p>This secondary source provides historical context on Michigan's prohibition era and its chaotic aftermath. In the timeline's secondary analysis, it is utilized to illustrate the unintended consequences of the nationwide alcohol ban, specifically detailing how the underground economy of speakeasies and blind pigs flourished. Furthermore, it supports the project's specific discussion of how bootlegging became a booming business across the Detroit River, ultimately demonstrating that the inability to legislate morality led to the repeal of Prohibition via the 21st Amendment.</p>
+
+                    <p class="text-[#ffb077] mt-12 text-3xl">A Law of Appeasement: Passing of the Sheppard-Towner Act</p>
+                    <p>Primary Source: Sheppard-Towner Maternity and Infancy Protection Act (1921). Embryo Project Encyclopedia.</p>
+                    <p class="break-words">https://embryo.asu.edu/pages/sheppard-towner-maternity-and-infancy-protection-act-1922</p>
+                    <p>This primary source provides the legislative text of the first federally funded social welfare program, which allocated resources for maternal and infant healthcare. In the context of this project, this act serves as the foundational evidence for analyzing political appeasement following the ratification of the 19th Amendment. This legislation demonstrates how male lawmakers initially feared the mobilized power of a monolithic woman's voting bloc, rushing to pass it to secure their newly expanded constituencies.</p>
+                    <p>Secondary Source: The Sheppard-Towner era: a prototype case study in federal-state relationships. American Journal of Public Health.</p>
+                    <p class="break-words">https://ajph.aphapublications.org/doi/pdf/10.2105/AJPH.57.6.1034</p>
+                    <p>This peer-reviewed secondary source analyzes the implementation and long-term impact of the Sheppard-Towner Act on American public health infrastructure. It evaluates how female reformers successfully utilized this temporary funding to reduce infant mortality rates through localized clinics and education. This source is essential to the timeline for explaining the program's ultimate demise; it illustrates how Congress swiftly defunded the act in 1929 once it became clear that women voted along existing partisan, regional, and intersectional lines rather than as a unified bloc, rendering political appeasement unnecessary.</p>
+
+                    <p class="text-[#ffb077] mt-12 text-3xl">Paper Citizens: State Efforts to Nullify Indigenous Citizenship</p>
+                    <p>Primary Source: U.S. Congress. Indian Citizenship Act of 1924. Immigration History.</p>
+                    <p class="break-words">https://immigrationhistory.org/item/1924-indian-citizenship-act/</p>
+                    <p>This primary legislative document, also known as the Snyder Act, granted federal citizenship to Native Americans born in the United States. In the timeline, this act is utilized to highlight the stark discrepancy between federal citizenship and state-level enfranchisement. It serves as the foundational evidence to illustrate how legal citizenship did not automatically guarantee political representation, as states immediately began deploying guardianship laws, literacy tests, and poll taxes to circumvent the federal mandate and suppress the Indigenous vote.</p>
+                    <p>Secondary Source: Native American Rights Fund. The Indian Citizenship Act at 100 Years Old. NARF.org.</p>
+                    <p class="break-words">https://narf.org/the-indian-citizenship-act-at-100-years-old/</p>
+                    <p>This contemporary secondary source reflects on the centennial of the 1924 legislation and explicitly details the ongoing systemic barriers Native communities face. It is utilized in the Modern-Day Ramifications section to connect the historical disenfranchisement directly to modern voter suppression tactics. By specifically referencing contemporary legal battles like Turtle Mountain Band v. Howe, this source reinforces the project's argument that the fight against gerrymandering and for equitable political access remains an active, ongoing struggle for Indigenous Americans a century later.</p>
+                </div>
             </div>
         </main>
 
-        <div class="w-full h-56 dark-glass border-t border-[#a35c27]/10 flex-none relative flex items-center px-2">
-            <button class="slider-btn" onclick="scrollNav(-500)">&#10094;</button>
-            <nav id="navContainer" class="flex h-full items-center overflow-x-auto nav-scroll w-full px-4 py-4">
+        <div class="w-full h-56 dark-glass border-t border-[#a35c27]/20 flex-none fixed bottom-0 left-0 flex items-center justify-start z-40">
+            <nav id="navContainer" class="flex h-full items-center justify-start overflow-x-auto nav-scroll w-full px-4 py-4">
             </nav>
-            <button class="slider-btn" onclick="scrollNav(500)">&#10095;</button>
         </div>
 
+    </div>
+
+    <div id="aboutModal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="glass-panel max-w-2xl w-full p-16 shadow-2xl relative text-left rounded-sm border border-white/20">
+            <button id="closeAbout" class="absolute top-6 right-8 text-white text-4xl" style="-webkit-text-stroke: 0; text-shadow: none;">&times;</button>
+            <h2 class="text-4xl mb-6 uppercase tracking-widest text-white font-light">Research Thesis</h2>
+            <p class="text-white text-3xl leading-relaxed">This application examines the American legal systems tendency to pivot rights based on conditionality. It identifies the historical mechanisms used to leverage the status of marginalized groups to ensure the continuity of power for a propertied elite.</p>
+        </div>
+    </div>
+
+    <!-- Image Lightbox Modal -->
+    <div id="lightboxModal" class="fixed inset-0 bg-black/95 z-[60] hidden flex items-center justify-center p-8 backdrop-blur-md cursor-pointer" onclick="closeLightbox()">
+        <span class="absolute top-6 right-8 text-white text-5xl hover:text-[#ffb077] transition" style="-webkit-text-stroke: 0; text-shadow: none;">&times;</span>
+        <img id="lightboxImage" src="" class="max-w-full max-h-[90vh] object-contain shadow-2xl rounded-sm">
     </div>
 
     <script>
@@ -141,126 +264,170 @@
             {
                 id: "1648",
                 year: "1648",
-                title: "Margaret Brent",
-                img: "https://i.postimg.cc/hts90xXd/1-colonial-power-play.png",
-                summary: "Margaret Brent challenged the gendered barriers of political power in Maryland. As an unmarried landowner managing her own property, she saved the colony from insolvency and mutiny. Her denial of a vote established that female contribution does not inherently confer political agency.",
-                bio: "Brent was a prominent settler who arrived in 1638. She ensured soldiers were paid using the proprietor's assets to prevent collapse. Despite her success, she was forced to leave Maryland after her actions were condemned by Lord Baltimore.",
-                detailed: "Maryland faced financial collapse and soldier revolts in 1648. Named executrix with instructions to take all and pay all, Brent liquidated cattle to settle debts. She demanded a vote for herself and another as Lord Baltimore's attorney. The Assembly refused, proving that property rights for women were conditional and subordinate to patriarchal rule.",
-                primary: [
-                    { desc: "Demand for Voyce", coll: "Governor and Council", id: "MSA 1701-4" },
-                    { desc: "Cattle Sale Records", coll: "Maryland Archives", id: "MSA S1071-4" }
+                title: "A Colonial Powerplay",
+                img: "https://i.postimg.cc/25qn9xrn/Brent_Court_Portrait.png",
+                portrait: "https://i.postimg.cc/zGy979bQ/Main_Portrait.jpg",
+                primaryImages: [
+                    "https://i.postimg.cc/K80K23JB/GOVERNOR_AND_COUNCIL_(Proceedings)_1647_1651_liber_A_folio_130_MSA_S1701_4.jpg",
+                    "https://i.postimg.cc/pLs9H5qF/GOVERNOR_AND_COUNCIL_(Proceedings)_1647_1651_liber_A_folio_213_MSA_S1071_4.jpg",
+                    "https://i.postimg.cc/RZg3BJXt/GOVERNOR_AND_COUNCIL_(Proceedings)_1647_1651_liber_A_folio_64_MSA_S_1071_4.jpg"
                 ],
-                secondary: "Scholarship frames this demand as a confrontation between English property law and colonial gender norms. It highlights the unique legal position of sole women who possessed property but lacked the franchise.",
+                summary: "The earliest recorded assertion of female political agency in the English North American colonies occurred in 1648, predating the formal womens suffrage movement by more than two centuries. Margaret Brent, an unmarried Catholic gentlewoman and a prominent landowner in the Maryland colony, forced an unprecedented confrontation with colonial leadership over the fundamental right to political participation.",
+                bio: "Margaret Brent arrived in St. Marys City in 1638. Defying the intense social pressure to marry, Brent remained single and engaged in extensive trading of tobacco, land, and indentured servants. She frequently appeared in the provincial court to sue for debts and protect her financial interests.",
+                detailed: "Long before the organized meetings at Seneca Falls or the rise of Susan B. Anthony as a household name, the story of Margaret Brent in colonial Maryland illustrates that the struggle for women's voting rights is not merely a 19th-century phenomenon but a significant thread interwoven into the very fabric of American history from its inception. Brent, a trailblazer in her own right, hailed from an influential Catholic family in England and arrived in Maryland in 1638. Right from the outset, she made her presence felt, challenging the prevailing norms of her time with resilience, intellect, and sheer determination.<br><br>As one of the first female landowners in the colonies, Brent didn't limit her role to that of a passive property owner. Instead, she actively managed estates, ran successful businesses, and became a notable—and often contentious—figure within the colonial administration. Her business acumen and ability to navigate the complex dynamics of colonial society earned her respect but also generated resentment among her male counterparts, who were unaccustomed to a woman wielding such influence.<br><br>A pivotal moment in her story emerged in 1648 following the death of Governor Leonard Calvert. Unlike the common practice of bequeathing authority to a male successor, Calvert entrusted Brent with the role of sole executor of his estate, reflecting his confidence in her capabilities. This vital decision placed her at the epicenter of Maryland's precarious situation, as the colony was deeply indebted and facing the potential mutiny of mercenary soldiers who threatened to stop protecting the settlement unless they received their pay. Displaying remarkable courage and resourcefulness, Brent acted swiftly. She liquidated the Governor's livestock, thereby raising the funds needed to settle outstanding debts and restore peace.<br><br>However, Brent was not content with merely resolving crises behind the scenes. She recognized a moment of constitutional \"ambiguity\" and saw an opportunity to assert herself within the political realm. With determined resolve, Brent made her way to the Maryland General Assembly. Rather than seeking permission or favor, she boldly demanded political representation. She sought two votes: one for herself as a free, wealthy landowner and another as the executor of the late Governor's affairs. This direct challenge to the male-dominated political structure underscored the idea that property ownership and political office were the sources of power reserved for men, and it highlighted the unjust exclusion of women from the political sphere.<br><br>The Assembly members' response was immediate panic. They faced an unprecedented challenge—granting her even a single vote would shatter the precarious precedent they were attempting to establish, one that sought to marginalize women irrespective of their contributions or status. Despite admitting that Brent had effectively saved the colony and managed the Governor's estate with unparalleled skill, they ultimately denied her request. Their rejection not only reinforced a longstanding dynamic of gender-based exclusion from the franchise but also laid the groundwork for future institutional barriers that women would face in their quest for equality.<br><br>Margaret Brent eventually relocated to Virginia, where she continued her life as an independent landowner, but the moment in 1648 remains a pivotal chapter in the story of American governance. Her bold assertion marked one of the earliest known challenges to the systemic injustices of gender-based disenfranchisement, illustrating that the fight for equality was not a spontaneous civil rights movement but a fundamental struggle rooted in the very foundations of this nation. Brent recognized the inherent injustice of being both taxed and governed without possessing a voice in the decisions that affected her life, and her actions in that moment remain a powerful testament to the resilience and tenacity of women throughout history.",
+                primary: [
+                    { desc: "Demand for Voice", coll: "Archives of Maryland", id: "MSA 1701-4" },
+                    { desc: "Cattle Sale Records", coll: "Archives of Maryland", id: "MSA S1071-4" }
+                ],
+                secondary: "Brents demand was not necessarily born of an egalitarian feminist ideology, but rather a pragmatic, tactical maneuver. She leveraged her elite status and noble birth to seek legal protection and parliamentary standing for the highly irregular financial actions she was forced to take to preserve the colony.",
                 analysis: "The rejection represented an assertive codification of exclusion. The colonial government established a precedent that prioritized biological sex over merit and economic contribution. This ensured political power remained a male prerogative regardless of female capability.",
-                modern: "The Brent legacy persists in the District of Columbia statehood movement. Her demand for representation over a century before the Revolution serves as a foundational milestone for feminist legal theory."
+                modern: "The modern day ramifications of her actions are profound and enduring. Her foundational articulation of taxation without representation established a nascent legal framework that would serve as a bedrock argument for the American Revolution and the broader suffrage movement."
             },
             {
                 id: "1662",
                 year: "1662",
-                title: "Hereditary Capital",
+                title: "Perpetual Bondage",
                 img: "https://i.postimg.cc/zvwLGZWg/2-From-Pater-Familias-to-Perpetual-Bondage.jpg",
-                summary: "The Virginia House of Burgesses mandated that child status follows the mother. This departure from English law transformed the biological status of enslaved women into a mechanism for self-sustaining labor and capital.",
-                bio: "Elizabeth Key Grinstead won her freedom in 1656 by arguing that status followed the father under common law. Her victory prompted the 1662 legislation intended to permanently close this pathway to freedom for children of color.",
-                detailed: "Partus sequitur ventrem was a strategic economic pivot. By reversing the tradition where status followed the father, the law ensured that children born to enslaved mothers were born into bondage. This created a hereditary engine of capital for white enslavers and codified a permanent racial hierarchy.",
+                portrait: "https://i.postimg.cc/zGy979bQ/Main_Portrait.jpg",
+                primaryImages: [
+                    "https://i.postimg.cc/9QDvbvRN/66bf8bc6e705f5098f0bce40_44_pic.png",
+                    "https://i.postimg.cc/x1BB4tLD/Screenshot_2026_03_06_142732.png",
+                    "https://i.postimg.cc/Qdvvy01n/Screenshot_2026_03_06_142854.png"
+                ],
+                summary: "In 1662, the Virginia General Assembly enacted a legislative doctrine that permanently altered the trajectory of American history called partus sequitur ventrem, translating to offspring follows the belly. This structurally bound enslaved womens biological fertility to the economic reproduction of slavery.",
+                bio: "The colonial elite grew increasingly paranoid about the potential for unified, cross racial uprisings among poor white servants and enslaved Black individuals. The legislative solution was a deliberate strategy to divide and conquer by embedding permanent racial distinctions and hereditary subjugation into the colonial legal code.",
+                detailed: "The 1662 Virginia mandate that instituted the principle of partus sequitur ventrem—translated as \"the offspring follows the condition of the mother\"—marked a deeply transformative and destructive shift in legal norms within the colony. This doctrine significantly altered the landscape of inheritance laws and a person's legal status, creating a stark departure from the long-established English common law of pater familias, which grounded legal status and rights primarily in paternal lineage. Historically, under English law, a child's status was often attributed to the father, allowing children born to free fathers a clear and attainable pathway to freedom, irrespective of their mother's status. However, the Virginia General Assembly's legislation marked a calculated move away from these principles, effectively nullifying paternal influence and consolidating power within maternal lineage, serving the economic interests of the colonial elite.<br><br>The rationale behind the 1662 law was deeply rooted in the need to establish a perpetual and self-sustaining labor supply. By codifying that the status of a child would be determined solely by the condition of the enslaved mother, the legislation effectively transformed every enslaved Black woman into a critical component of a capitalist enterprise—her womb became an \"engine of capital.\" This legal framework ensured that the enslaved population would not only persist but would regenerate itself indefinitely, creating a reliable source of labor for plantation owners and allowing for the expansion of the slave economy. Furthermore, it eliminated any moral or legal restraints on the exploitation of enslaved women for reproduction, especially in cases where the father was a white man. This blatant disregard for the humanity of these women and their children highlighted the urgent need to confront racial injustices that have persisted throughout American history.<br><br>The second critical objective of the law was to entrench the institution of slavery on a distinctly racial basis. By explicitly linking servitude and the condition of enslavement to the Black mother, the mandate rendered Blackness synonymous with perpetual servitude while ensuring that any potential freedom could no longer be transmitted through a white father. This strategic reconfiguration of legal status dismantled any existing legal ambiguities or loopholes that might have offered a pathway to liberation for biracial or mixed-race children. As a result, the act solidified a system of racial hierarchy, embedding it into the very fabric of colonial society and ensuring the economic and social dominance of the colonial elite.<br><br>The implications of the 1662 law were far-reaching and irrevocably altered the trajectory of American society. It not only codified the conditions of slavery but also laid the groundwork for the racially-based slave system that would become integral to the existence and identity of the United States. By integrating racial inequality into its legal framework, the law established mechanisms that would perpetuate the brutal system of American chattel slavery across generations, ultimately shaping the nation’s history and ongoing struggles against racial injustice. Through this legislation, Virginia and, by extension, the colonies set a precedent that would define character and class for centuries, institutionalizing a system of oppression that would require monumental effort to dismantle.",
                 primary: [
                     { desc: "Virginia Act XII", coll: "Statutes at Large", id: "Dec 1662" }
                 ],
-                secondary: "Legal historians analyze how this created a uniquely American form of chattel slavery. Works by Kathleen Brown explore how gender and race were weaponized to sustain the plantation economy.",
-                analysis: "This framework hardwired the exploitation of Black bodies into America's economic foundation. It established a lineage of property that enriched white heirs while ensuring generations of African-descended people remained commodified assets.",
-                modern: "The residue of this era is visible in modern maternal health disparities. Black women face mortality rates nearly four times higher than white women, reflecting a systemic devaluation of their bodily autonomy rooted in colonial law.",
+                secondary: "Historians analyze how this created a uniquely American form of chattel slavery. It transformed the biological reality of human reproduction into a grim, self sustaining engine for wealth accumulation, inflicting a state of social death that permanently alienated enslaved individuals from the concept of family.",
+                analysis: "The economic ramifications of commodifying Black womens bodies cascaded through the centuries, creating a rigid racial hierarchy that explicitly tied rights, citizenship, and property ownership to race. It established a lineage of property that enriched white heirs while ensuring generations of African descended people remained commodified assets.",
+                modern: "Today, the modern day ramifications of the 1662 Virginia statute are starkly quantifiable. Statistical data indicate that while Black Americans constitute 13 percent of the United States population, they possess a mere 2.6 percent of the nations wealth.",
                 chart: { type: 'bar', title: 'Maternal Mortality Ratio (per 100k)', labels: ['White', 'Black'], data: [14.5, 49.4] }
             },
             {
                 id: "1869",
                 year: "1869",
-                title: "Schismatic Split",
+                title: "The Civil War Within",
                 img: "https://i.postimg.cc/pVQy8v9c/3-Schizmatic-Suffragists.jpg",
-                summary: "The movement fractured when the 15th Amendment granted voting rights to Black men while excluding women. White suffrage leaders used racist rhetoric to argue for their own enfranchisement first, creating deep racial fault lines.",
-                bio: "Elizabeth Cady Stanton and Susan B. Anthony prioritized white female suffrage over universal rights. They were challenged by Harper and Douglass, who argued that Black male suffrage was a matter of physical survival during Reconstruction.",
-                detailed: "The 1869 schism split the movement into rival organizations. The NWSA refused to support any amendment that did not include women. Their strategy included forming alliances with white supremacists to argue that educated white women were more deserving of the vote than formerly enslaved men.",
+                portrait: "https://i.postimg.cc/W41Lrhmc/Main_Portrait.jpg",
+                primaryImages: [
+                    "https://i.postimg.cc/9QVjmxr8/28516389.jpg",
+                    "https://i.postimg.cc/cLmGrQnk/default.jpg",
+                    "https://i.postimg.cc/jSKrx8Lk/images.jpg"
+                ],
+                featuredImage: "https://i.postimg.cc/BngfXxKB/ant_1870_san_fran_chronicle_Champions.jpg",
+                summary: "The mainstream American suffrage movement was deeply fractured by ideological disagreements, racism, and strategic betrayals. The critical breaking point occurred in 1869, resulting in the dissolution of the American Equal Rights Association over the exclusion of women from the 15th Amendment.",
+                bio: "Elizabeth Cady Stanton and Susan B. Anthony formed the National Woman Suffrage Association, explicitly opposing the 15th Amendment unless it included women. Prominent Black suffragists like Ida B. Wells Barnett, Mary Church Terrell, and Frances Ellen Watkins Harper continuously confronted white leaders over their exclusionary tactics.",
+                detailed: "The passage of the 15th Amendment in 1870 marked a pivotal point in American history, granting Black men the right to vote, but it also precipitated a profound schism within the women’s suffrage movement. In 1869, this amendment ignited an intense debate with substantial implications for race and gender rights, revealing underlying tensions that had long existed within the movement. The conflict boiled down to a critical dilemma: should white women accept the partial advancement of Black men’s voting rights, termed the \"Negro’s hour\"—a concept championed by suffragists like Lucy Stone and her husband Henry Blackwell—or should they vocally oppose it due to the exclusion of women from that same enfranchisement?<br><br>The result was the emergence of two competing factions. The National Woman Suffrage Association (NWSA), spearheaded by Elizabeth Cady Stanton and Susan B. Anthony, took a fiercely oppositional stance. They viewed the ratification of the 15th Amendment—an achievement for Black men—as a betrayal by their erstwhile abolitionist allies, arguing that women's rights should not be sacrificed for the sake of Black male suffrage. Their ultimate aim was to secure a federal amendment guaranteeing women's voting rights, and they were resolute in their resolve to challenge anyone who stood in their way. Unfortunately, this determination led to some regrettable political maneuvers. The NWSA engaged with racist elements in society, attempting to garner support from nativist groups that sought to maintain white supremacy. Stanton, in one of her most controversial statements, asserted that educated white women should possess the franchise before Black men, who had only recently been liberated from slavery. This rhetoric not only showcased a stark betrayal of the principles of racial equality but also underscored their willingness to exploit racial divisions for the sake of advancing their own agenda.<br><br>In contrast, the American Woman Suffrage Association (AWSA), led by Stone and Blackwell, adopted a more pragmatic \"half-a-loaf\" philosophy. They recognized that extending the right to vote to Black men was an indispensable step towards achieving broader Reconstruction goals and sought to maintain solidarity with those who fought for racial justice. Rather than pursuing a contentious federal amendment, the AWSA focused on grassroots efforts, prioritizing state-by-state campaigns to secure suffrage while nurturing relationships with the Republican Party and established abolitionist networks. Their approach emphasized the necessity of incremental progress, believing that winning over allies was more vital than engaging in divisive battles.<br><br>The division between the NWSA and the AWSA not only fractured the women's suffrage movement but also cast a long shadow over American feminism, exposing the entrenched racial prejudices that would reverberate for generations. The NWSA's inflammatory rhetoric alienated many Black women and men, sending a clear signal that their struggles for equality were secondary to the aspirations of white women. This rift diminished the movement’s collective strength for about two decades, until a fragile reconciliation in 1890 led to the formation of the National American Woman Suffrage Association (NAWSA). However, the historical legacy of prioritizing white women’s enfranchisement while marginalizing racial equality left a \"metastasized\" fault line that has continued to affect social justice movements.<br><br>This history serves as a critical reminder that the fight for liberty and equality is not solely about the ideals espoused; it deeply involves the identities and experiences of those involved. The question of \"who\" represents the fight for rights is just as crucial as the \"what\" of those rights, highlighting the intersections of race, gender, and power in the ongoing struggle for social justice.",
                 primary: [
                     { desc: "Proceedings of AERA", coll: "Library of Congress", id: "May 1869" }
                 ],
-                secondary: "Martha Jones and Rosalyn Terborg-Penn document the erasure of Black women from this era's mainstream narrative. They analyze how the split entrenched racial hierarchies within the feminist movement.",
-                analysis: "The prioritization of corporate rights over human liberty is also evident in this era. Between 1868 and 1912, the Supreme Court heard over 300 cases regarding corporate property and only 28 regarding African American rights.",
-                modern: "Turnout disparities and modern voter suppression tactics reflect the enduring legacy of this exclusion. The myth of a unified female voting bloc continues to ignore these deep historical and racial divisions.",
+                secondary: "Black leaders articulated a distinct political reality. While white suffragists were primarily fighting for political rights to elevate their civic status, Black women were simultaneously battling existential wrongs, needing the ballot to protect their lives from the horrors of the Jim Crow South and the epidemic of lynching.",
+                analysis: "The historical exclusion of women of color catalyzed the recognition that the female experience is not uniform. This realization forms the bedrock of intersectional feminism, a critical theoretical framework that provides a prism for seeing how overlapping forms of inequality operate together to exacerbate one another.",
+                modern: "The ultimate lesson extracted from the suffrage schism is the necessary dismantling of the myth of the monolithic female vote. Modern political science recognizes that women do not vote as a singular, unified bloc, but rather their political behavior is shaped by deeply entrenched intersectional identities.",
                 chart: { type: 'bar', title: 'Supreme Court Cases (1868-1912)', labels: ['Corporate', 'African American'], data: [312, 28] }
             },
             {
                 id: "1870",
                 year: "1870",
-                title: "Utah Gambit",
+                title: "Conditional Rights",
                 img: "https://i.postimg.cc/sgMVnCXS/6-utah-s-u-turn-for-polygamy.png",
-                summary: "Utah granted women the vote as a tactical shield for polygamy against federal interference. When women supported the church rather than dismantling it, the federal government summarily stripped their rights away in 1887.",
-                bio: "Brigham Young and LDS leaders enfranchised Mormon women to double their electoral base. They recognized that a unified voting bloc could protect regional customs from federal prosecution.",
-                detailed: "The Utah Gambit proves that rights granted for political expediency are fundamentally conditional. Suffrage was a defensive tool used by the territory. The federal Edmunds-Tucker Act of 1887 revoked these rights to break the political power of the LDS church, proving liberties can be withdrawn at will.",
+                portrait: null,
+                summary: "The enfranchisement of women in the Utah Territory in 1870, and the subsequent revocation of those rights, illuminates how voting rights were manipulated as statutory tools rather than recognized as inalienable human rights.",
+                bio: "Recognizing the shifting political landscape and the impending threat of federal intervention, LDS Church leaders executed a remarkable, highly pragmatic strategic maneuver. They enfranchised Mormon women to double their electoral base and create a demographic firewall against federal anti polygamy legislation.",
+                detailed: "Utah giving women the vote in 1870 wasn't some enlightened leap toward gender equality. It was a cold-blooded, cynical political calculation. Church leaders in the LDS Church were caught in a vice, with the federal government breathing down their necks to kill off polygamy. They saw women’s suffrage not as a right, but as a strategic defense mechanism. The logic was simple and entirely pragmatic: if you give Mormon women the ballot, you effectively double the pro-Church electoral base. They weren't trying to \"liberate\" anyone; they were trying to build a wall of voters to stop anti-polygamy laws from hitting them from Washington, D.C. They hoped for a unified front—one that included their wives—so the feds would think twice about intervening.<br><br>For a while, the gamble actually paid off. Mormon women, many of whom were living in polygamous marriages, didn't use the vote to \"rebel.\" Instead, they voted exactly how the Church needed them to, protecting their families and their way of life from what they saw as external persecution. This loyalty was a slap in the face to federal lawmakers and reformers. Those guys in D.C. had a \"misguided\" fantasy that if you gave these women the vote, they’d immediately turn around and vote their husbands out of power. When the women did the opposite, the \"frustrated\" reformers realized their plan had backfired.<br><br>When it became evident that suffrage was serving as a bulwark for the very practice the government wanted to destroy, Congress stopped pretending to care about the \"democratic process\" and got punitive. In 1887, the federal government passed the Edmunds-Tucker Act. The act was a comprehensive hit job designed to gut the economic and political power of the LDS Church. Buried in that legislation was a provision that explicitly and unilaterally stripped every woman in the Utah Territory of her right to vote. The federal government didn't debate the \"moral\" right to the franchise; they just took it back the second it stopped serving their agenda.<br><br>The Utah episode is a \"sobering\" lesson in how power actually works. It proves that when the state grants a right as a tactical move for self-preservation rather than out of actual justice, that right is fundamentally conditional. These aren't solid constitutional pillars; they're fragile privileges that can be \"summarily stripped away\" the moment they become inconvenient. The experience of these women highlights the \"essential distinction\" between rights rooted in principle and the temporary favors granted by a governing power looking to save its own skin.",
                 primary: [
                     { desc: "Utah Territorial Act", coll: "State Archives", id: "1870 Feb 12" },
                     { desc: "Edmunds-Tucker Act", coll: "Statutes at Large", id: "24 Stat. 635" }
                 ],
-                secondary: "Sarah Barringer Gordon analyzes the legal warfare between Utah and the federal government. Scholars examine how the female franchise was weaponized in the national struggle over theocratic rule.",
-                analysis: "When the state grants a right for its own self-preservation, that right remains fragile. Rights in Utah were treated as temporary favors rather than pillars of democracy, subject to the shifting priorities of federal authority.",
-                modern: "This mirrors modern concerns regarding Unitary Executive Theory. Federal authority can be weaponized to dismantle programs and rights based on political rivalry, treating the franchise as a transactional asset."
+                secondary: "The revocation of suffrage in Utah serves as a profound historical warning regarding the concept of conditional rights. The secondary analysis highlights the extreme precarity of statutory rights granted solely for their political utility.",
+                analysis: "When a marginalized groups political agency is treated as a strategic asset rather than an inherent, fundamental right, it can be seamlessly legislated away when it no longer serves the objectives of the dominant power structure. Rights in Utah were treated as temporary favors subject to shifting priorities.",
+                modern: "The franchises vulnerability in 1887 mirrors contemporary political battles over voter access across the United States. The legacy of Utahs U-turn underscores that without robust, unassailable constitutional protections, access to the ballot remains perpetually vulnerable to partisan advantage."
             },
             {
                 id: "1917",
                 year: "1917",
-                title: "War on Dissent",
+                title: "A Great War of Dissent",
                 img: "https://i.postimg.cc/fb0RbQQN/4-kaiser-wilson.jpg",
-                summary: "Alice Paul and the Silent Sentinels were arrested for picketing the White House during WWI. Their brutal treatment at the Occoquan Workhouse revealed the state's willingness to use violence to silence political dissent.",
-                bio: "Alice Paul led the National Woman's Party with militant tactics learned in Britain. She was force-fed in prison for her refusal to stop picketing the President during wartime, becoming a symbol of the cost of dissent.",
-                detailed: "The Espionage Act of 1917 was used to criminalize protest. Suffragists carrying banners comparing President Wilson to the German Emperor were charged with obstructing traffic. The resulting beatings and force-feedings were state-sanctioned efforts to break their political resolve.",
+                portrait: "https://i.postimg.cc/rsHFZ7cF/Screenshot-2026-03-06-151844.png",
+                primaryImages: [
+                    "https://i.postimg.cc/Kj822ffd/espionage_act_(1).jpg",
+                    "https://i.postimg.cc/MHpSS5tJ/331_detail.jpg",
+                    "https://i.postimg.cc/Wz1vv8SR/851_detail.jpg"
+                ],
+                summary: "The final, climactic years of the fight for the 19th Amendment were waged against the tense backdrop of World War I. To crush domestic opposition to the war effort and enforce ideological conformity, the administration of President Woodrow Wilson enacted the Espionage Act of 1917.",
+                bio: "Alice Paul imported a strategy of direct, highly visible confrontation to the American movement. She led the Silent Sentinels, picketing the executive mansion six days a week for over two and a half years, highlighting Wilsons glaring hypocrisy in fighting for democracy abroad while denying it at home.",
+                detailed: "The fight for women's suffrage hit a boiling point just as the United States dove into the meat-grinder of the First World War. By 1917, the political climate in D.C. had curdled, turning a peaceful request for the vote into a \"perilous\" threat to federal authority. President Woodrow Wilson, obsessed with national unity for the war effort, oversaw the passage of the Espionage Act of 1917 and the Sedition Act of 1918. These laws weren't just about catching spies; they were sweeping, heavy-handed tools designed to criminalize anyone who dared to talk back to the government, a massive overreach that targeted anyone getting in Wilson's way.<br><br>Alice Paul and the National Woman's Party (NWP) weren't interested in playing the part of the \"quiet, patriotic\" women. They saw the \"gut-wrenching\" hypocrisy of Wilson preaching about fighting for democracy in Europe while denying it to half the people standing right in front of him. Paul and her \"Silent Sentinels\" decided to stop asking and start confronting, setting up a round-the-clock picket line at the White House gates—the first time any group had the \"audacity\" to do that in American history. They weren't just standing there; they were holding up silk and velvet banners that delivered a stinging blow to Wilson's ego, with the most \"incendiary\" move being a comparison of the American President to the authoritarian German Emperor, Wilhelm II. Calling him \"Kaiser Wilson\" wasn't just a sick burn; it was a calculated move that skirted the very edge of treason under the new wartime laws.<br><br>The arrests that followed had nothing to do with \"obstructing traffic,\" which was just a thin legal mask for a state-sanctioned campaign to silence women who were embarrassing the administration on the world stage. When Alice Paul and the others were shipped off to the Occoquan Workhouse in Virginia, the state’s desperation really turned ugly. Because the suffragists refused to recognize the court’s authority, they went on hunger strikes, and the government responded with brutal, \"horrifying\" force-feedings. These women were pinned down while tubes were shoved into noses or throats to pump raw eggs and milk into them in a violent attempt to break their will and dismantle the movement.<br><br>The \"Night of Terror\" at Occoquan finally broke the silence. When the public found out that respectable American women were being treated like political prisoners and tortured in a Virginia workhouse, the outcry was \"massive.\" The Wilson administration realized that the political cost of trying to crush these women was finally higher than the cost of actually giving them the vote. The violence in that workhouse was a failed attempt by a scared government to maintain its \"moral compass\" while acting like a typical bully during a national emergency.",
                 primary: [
                     { desc: "Schenck v. United States", coll: "Supreme Court", id: "249 U.S. 47" }
                 ],
-                secondary: "Legal scholars analyze the clear and present danger test established during this era. Linda Ford documents the transition toward militant tactics and the physical abuse of political prisoners.",
-                analysis: "The government used national security as a pretext to crush political embarrassment. The convictions established legal precedents for the suppression of free expression that have persisted for over a century in American law.",
-                modern: "The 1917 law remains active and is used to prosecute whistleblowers like Snowden and Assange. The tension between security and free expression remains a defining struggle in the modern digital age."
+                secondary: "The ensuing news media exposure of the brutalization of middle class women exposed the administrations authoritarian tactics and generated immense public sympathy for the suffrage cause. Facing mounting political pressure, President Wilson dramatically reversed his stance and publicly endorsed the federal amendment in January 1918.",
+                analysis: "The government used national security as a pretext to crush political embarrassment. The legal precedent established by the Wilson administration to suppress dissent was subsequently upheld by the Supreme Court in 1919, articulating the clear and present danger test to justify restricting free speech during wartime.",
+                modern: "The broad, vague language of the 1917 Espionage Act remains highly active today. The Department of Justice continues to invoke the century old statute to prosecute modern whistleblowers, representing an unresolved tug of war between First Amendment rights and national security."
             },
             {
                 id: "1919",
                 year: "1919",
-                title: "Dry Victory",
+                title: "A Dry Victory",
                 img: "https://i.postimg.cc/8cw1Y1MH/5-a-dry-victory.png",
-                summary: "The 18th Amendment was a massive show of female political power via the WCTU. Banning alcohol necessitated the creation of the federal income tax and the expansion of federal law enforcement agencies.",
-                bio: "Frances Willard and the WCTU framed alcohol as the primary threat to domestic safety. As the largest women's organization of the era, they used moral authority as a powerful political lever to transform the state.",
-                detailed: "National Prohibition built the bureaucratic machinery of the modern state. The loss of liquor excise taxes forced the government to rely on income tax for revenue. Local enforcement failures led to the growth of the FBI and the professionalization of surveillance and raids.",
+                portrait: "https://i.postimg.cc/0N5GsJDj/womens_suffrage_and_prohibition.png",
+                primaryImages: [
+                    "https://i.postimg.cc/bvY0h2kS/Screenshot_2026_03_06_154649.png",
+                    "https://i.postimg.cc/8CkdSrMP/images.jpg",
+                    "https://i.postimg.cc/BvZ501Hq/6332c5f9_a063_44d4_b886_941bf27b845b.avif"
+                ],
+                summary: "The push for womens suffrage was deeply intertwined with the temperance movement. Through massive organizations like the Womens Christian Temperance Union, women organized fiercely against the rampant domestic violence and financial ruin associated with the widespread consumption of alcohol.",
+                bio: "Activists in Michigan utilized overlapping reform networks to advance a broad maternalist agenda. Clara B. Arthur of Detroit led intensive educational campaigns for suffrage while simultaneously working to combat public health crises like tuberculosis and child labor.",
+                detailed: "The historical intersection of the temperance movement and the fight for women's suffrage provides a compelling case study in political mobilization that profoundly reshaped the American sociopolitical landscape. One cannot fully appreciate these movements as separate entities—indeed, the slogan \"the ballot and the bottle\" encapsulates the idea that the struggle for women's rights was inextricably linked to anti-alcohol advocacy. For decades, the Women's Christian Temperance Union (WCTU) emerged as the most influential and far-reaching women's organization in the United States, effectively mastering the intricacies of public advocacy to wield political power in unprecedented ways.<br><br>The WCTU's political strategy was intricately designed to frame alcohol not merely as a personal vice but as a fundamental societal threat—one endangering the sanctity of the American home and community. They portrayed alcohol as the root cause of myriad social issues, including domestic violence, systemic poverty, child neglect, and overall societal decay. By tightly linking the temperance movement to the welfare of women and children, the organization became adept at mobilizing support from diverse segments of society. Through public speaking, grassroots organizing, and lobbying efforts, the WCTU transformed temperance into more than just a moral cause; it became a significant political force. This sustained and impassioned advocacy for temperance engaged women politically long before the ratification of the 19th Amendment in 1920 granted women the constitutional right to vote.<br><br>The passage of the 18th Amendment in 1919, which initiated Prohibition, can be viewed as one of the first massive instances of organized female political power being flexed on a national level. This landmark legislative victory served as a clear and stunning testament to the WCTU's remarkable ability to galvanize public opinion and form strategic alliances with other powerful organizations, such as the Anti-Saloon League. Their adept lobbying successfully pressured both state and federal legislatures into enacting this sweeping social reform. Central to their success was the Victorian-era notion of women's \"moral authority,\" the belief that women, perceived as the guardians of the home and arbiters of societal morality, possessed a moral obligation to purify society. This concept became a highly effective and persuasive tool for political action, supporting their legislative objectives.<br><br>While the 18th Amendment succeeded in establishing a constitutional ban on the manufacture, sale, and transportation of intoxicating liquors, it ultimately fell short of its ambitious goal of cleansing the nation of its perceived moral failings. The decade of Prohibition (1920-1933) churned out a complex and often unmanageable societal landscape, rife with contradictions. Rather than achieving the intended societal purity, Prohibition ignited a surge in organized crime, encouraged rampant lawlessness, and led to the establishment of a massive black market for illicit alcohol. The enforcement of Prohibition strained law enforcement resources and complicated the legal system, resulting in widespread political backlash that culminated in the amendment's repeal.<br><br>The inability to sustain this legislative morality amid widespread disobedience and public dissent underscores the complex legacy of the WCTU's success. Although the organization demonstrated remarkable political organization and mobilization, the reality of governance proved to be far more complex. The repeal of the 18th Amendment in 1933 revealed that the vast moral authority wielded by women as political activists could be curtailed in its effectiveness when confronted with the multifaceted challenges of governing a diverse and often resistant populace. The WCTU's efforts served as a powerful illustration of how political victories, even those achieved through immense collective effort, may ultimately be difficult to preserve against the social and economic realities of the time.",
                 primary: [
                     { desc: "Volstead Act", coll: "U.S. Congress", id: "H.R. 6810" }
                 ],
-                secondary: "Lisa McGirr analyzes how Prohibition fueled the growth of the carceral state. Scholars focus on the birth of federal policing and the shift from excise taxes to a permanent income tax system.",
-                analysis: "The moral authority of women was the catalyst for a fundamental fiscal and legal transformation of the government. Techniques developed for enforcement became standard tools for the modern state's control of private behavior.",
-                modern: "The shift to income tax remains the state's core fiscal tool. The expansion of federal law enforcement and modern carceral tactics find their origins in this era's moral crusade."
+                secondary: "The expectation of an orderly, moral society rapidly dissolved into a chaotic, violent underground economy. In Michigan, illegal blind pigs flourished, and the states proximity to Canada transformed Detroit into the epicenter of a massive, violently contested bootlegging industry.",
+                analysis: "National Prohibition built the bureaucratic machinery of the modern state. The loss of liquor excise taxes forced the government to rely on income tax for revenue. Local enforcement failures led to the growth of the FBI and the professionalization of surveillance and raids.",
+                modern: "The shift to income tax remains the states core fiscal tool. This historical epoch stands as a definitive demonstration of the limitations of state power in policing personal morality, and the unpredictable, often violent ripple effects of single issue legislative victories."
             },
             {
                 id: "1921",
                 year: "1921",
-                title: "Appeasement",
+                title: "A Play for Appeasement",
                 img: "https://i.postimg.cc/TP8XCyF9/7-appeasement.jpg",
-                summary: "Congress passed the Sheppard-Towner Act to mollify the newly enfranchised female electorate. Once politicians realized women did not vote as a unified bloc, they allowed the program to die in 1929.",
-                bio: "Julia Lathrop, head of the Children's Bureau, advocated for scientific motherhood and public responsibility for health. She was a veteran of Hull House and the first woman to head a federal bureau.",
-                detailed: "The act was the first federally funded social welfare program. It reduced infant mortality but was opposed by the medical establishment as socialized medicine. Once the political threat of a female bloc vanished, the incentive to fund the program ended.",
+                portrait: "https://i.postimg.cc/QC6PsrnZ/Banner.jpg",
+                primaryImages: [
+                    "https://i.postimg.cc/Xq2h30D0/Thumb_1.jpg",
+                    "https://i.postimg.cc/FzPqmQnv/Thumb_2.webp",
+                    "https://i.postimg.cc/yxf5BzrB/Thumb_3.png"
+                ],
+                summary: "The immediate aftermath of the ratification of the 19th Amendment in 1920 offers a highly instructive study of political behavior. The swift passage of the National Maternity and Infancy Protection Act in 1921 was the direct result of political appeasement driven by the overwhelming fear of a unified female voter base.",
+                bio: "A 1917 report by the U.S. Childrens Bureau highlighted a dire public health crisis, estimating that 15,000 women died annually from childbirth complications. Advocates faced severe legislative roadblocks until the enfranchisement of women nationwide terrified male politicians.",
+                detailed: "The ratification of the 19th Amendment in 1920, which granted women the right to vote, reverberated throughout the halls of the U.S. Congress, igniting a profound unease among legislators. This seismic shift in the political landscape was underscored by a pervasive fear: the potential emergence of women as a formidable, monolithic voting bloc capable of wielding considerable political influence. Many lawmakers were anxious that this new electorate might challenge the status quo and overturn established norms that had long defined American politics.<br><br>In light of this apprehension, Congress launched an immediate and strategic effort to appease the newly enfranchised women voters. Politicians sought to signal their responsiveness to the issues that mattered most to women, aiming to secure their support and loyalty in future elections. This calculated move culminated in the passage of the Sheppard-Towner Act of 1921, formally known as the Promotion of the Welfare and Hygiene of Maternity and Infancy Act. This momentous piece of legislation marked the first federally funded social welfare program in the United States specifically aimed at improving maternal and infant health care.<br><br>The Sheppard-Towner Act provided essential resources, including prenatal clinics, visiting nurses, and educational materials to inform women about health and childcare practices. By emphasizing maternal and infant welfare, the legislation sought to address public health issues that were of paramount importance to many women, thereby appealing to their interests and demonstrating that Congress was willing to take their concerns seriously.<br><br>At its essence, the Sheppard-Towner Act was a political concession, a tangible acknowledgment of women's needs and an attempt to forge a connection with this newly empowered electorate. It represented a significant victory for the Progressive-era women reformers who had tirelessly campaigned for improved public health measures, reflecting a growing recognition of women’s roles not only as voters but also as active participants in shaping public policy.<br><br>However, the initial congressional anxiety about women's voting power soon proved unfounded. As subsequent elections unfolded, political analysts and elected officials began to understand a crucial reality: women did not form a single, dedicated voting bloc. Rather, they tended to cast their ballots in line with existing socio-economic, regional, and, crucially, established party affiliations, mirroring the voting behaviors of their male counterparts.<br><br>As the concept of a cohesive and decisive \"woman's vote\" faded, so too did the political imperative to sustain the programs designed to enchant them. The original fear that had fueled the Sheppard-Towner Act's passage evaporated, leading to a reassessment of the necessity of such social welfare initiatives. The financial support for the Sheppard-Towner Act, which had been implemented as a means of political appeasement, began to be dismantled gradually. By 1929, a mere eight years after its inception, the program was ultimately terminated.<br><br>The demise of the Sheppard-Towner Act serves as a poignant historical illustration of how political expediency affects the life cycle of social policy in the United States. It underscores the volatility of congressional support, which can hinge on perceived electoral significance, revealing how women's political representation was initially commodified but ultimately diminished as fears of a unified voting bloc receded. This episode highlights the complexities of gender, politics, and social policy in early 20th-century America, illuminating the ongoing struggle for women's rights and representation in the political sphere.",
                 primary: [
                     { desc: "Sheppard-Towner Act", coll: "Statutes at Large", id: "42 Stat. 224" }
                 ],
-                secondary: "Historians examine the medicalization of pregnancy and the racialized thinking about families embedded in the act's guidance. It reflects a transition from private charity to state-managed welfare.",
-                analysis: "The rise and fall of the program illustrate the transactional nature of legislative rights. While the act expired, its DNA survived in the Social Security Act of 1935, cementing middle-class white values in federal policy.",
-                modern: "Modern child welfare reforms struggle with the legacy of poverty-related neglect and family separation born from this era's guidance. Rights remain dependent on perceived electoral unity."
+                secondary: "The American Medical Association aggressively lobbied against the bill, viewing federal funding as a dangerous infringement on physician autonomy. Conservative groups utilized Red Scare tactics, framing the legislation as an anti federalist plot to Sovietize the United States.",
+                analysis: "The rise and fall of the 1921 Act provides a historical masterclass on the vulnerability of social welfare legislation. Public policy designed to aid marginalized groups is inherently fragile when it relies solely on the perceived political capital of its beneficiaries.",
+                modern: "While the specific program died in 1929, it served as the vital prototype for the complex federal state funding relationships that define modern social safety nets. Its programmatic architecture was directly resurrected and modeled in Title V of the Social Security Act of 1935."
             },
             {
                 id: "1924",
                 year: "1924",
                 title: "Paper Citizens",
                 img: "https://i.postimg.cc/7htF7bSJ/8-Citizen-act.png",
-                summary: "The Indian Citizenship Act conferred citizenship on all Indigenous peoples, yet states used guardianship laws and literacy tests to block their access to the ballot for decades.",
-                bio: "Indigenous veterans of WWI were primary drivers for the Snyder Act. They demanded the same rights they defended on the battlefield, yet returned to a homeland that actively nullified their status as citizens.",
-                detailed: "States used 'ward of the state' status to label Indigenous individuals incompetent to vote. The acquisition of legal citizenship did not assure agency. Tribal members were forced to litigate for decades to remove infrastructure barriers built to silence them.",
+                portrait: "https://i.postimg.cc/qqbkFSs7/Banner.jpg",
+                primaryImages: [
+                    "https://i.postimg.cc/qqbkFSsN/Thumb_1.jpg",
+                    "https://i.postimg.cc/PJ3t79Wv/Thumb_2.webp",
+                    "https://i.postimg.cc/J061FvNy/Thumb_3.webp"
+                ],
+                summary: "The struggle for the ballot did not end in 1920 with the 19th Amendment. Millions of women of color, particularly Indigenous women, remained legally barred from political participation until the Indian Citizenship Act of 1924 categorically granted birthright citizenship to all Native Americans.",
+                bio: "Indigenous veterans of WWI were primary drivers for the Snyder Act. They demanded the same rights they defended on the battlefield, yet returned to a homeland that actively nullified their status as citizens through state level suppression tactics.",
+                detailed: "The conventional narrative surrounding women’s suffrage often portrays the passage of the 19th Amendment in 1920 as a decisive moment of triumph—a universal celebration of female empowerment and a definitive “happily ever after.” However, this framing is deeply misleading and undermines the complexity and fragmentation of rights within the United States, particularly for marginalized groups. For instance, Native American women found little reason to celebrate in 1920, as the reality at the ballot box starkly contradicted the notion that the struggle for suffrage had ended. Rather, they were legally classified as non-citizens on their own ancestral lands, effectively disenfranchising them and revealing the deep-seated contradictions in the suffrage movement.<br><br>The Indian Citizenship Act of 1924, also known as the Snyder Act, purported to grant U.S. citizenship to all Indigenous peoples born within the United States. In theory, this law should have dismantled the legal impediments preventing Native Americans from voting. Yet, while federal citizenship was an essential first step, it marked merely the beginning of a protracted struggle for genuine political participation and equality.<br><br>In the aftermath of the Snyder Act’s passage, several West and Southwest states—regions with significant Native populations that could disrupt the political landscape—began erecting sophisticated legal barriers to undermine federal recognition. Governments utilized insidious tactics, including guardianship laws, to create a veneer of legitimacy around their actions. They would label Indigenous individuals as \"incompetent\" or declare them \"wards of the state\" solely due to their residence on a reservation or their adherence to tribal affiliations. This designation functioned as a state-sanctioned method of asserting that these individuals were suddenly incapable of fulfilling their civic responsibilities at the very moment they gained the theoretical right to do so.<br><br>Moreover, the established tactics for excluding voters in traditional ways—like literacy tests and property ownership requirements—were weaponized to specifically target Native American communities. These mechanisms were not simply neutral regulations; they were systematically designed to disenfranchise Indigenous people. Many states employed these barriers with such precision that thousands of eligible voters remained unregistered for decades after the Snyder Act was enacted. This deliberate and protracted exclusion was not a minor oversight but was maintained well into the mid-20th century.<br><br>In Arizona, for example, it wasn't until the landmark 1948 case Harrison v. Laveen that the systemic barriers were finally confronted in a court of law, illustrating the relentless fight for voting rights that persisted long after 1924. This history serves as irrefutable evidence that the landscape of American politics is one where federal citizenship does not guarantee participation in the democratic process. It highlights the painful reality that, for many, the privilege of representation is conditional—a privilege the state actively seeks to withhold, regardless of the legal changes that may appear on paper. The struggles of Native American women and communities fundamentally challenge the simplistic, celebratory narrative of suffrage, exposing ongoing inequities that continue to resonate in contemporary discussions about voting rights and representation in the United States.",
                 primary: [
                     { desc: "Indian Citizenship Act", coll: "Statutes at Large", id: "43 Stat. 253" }
                 ],
-                secondary: "Scholars analyze the use of state law to bypass federal mandates. Legal barriers in Arizona and New Mexico were particularly high, relying on guardianship status to prevent registration.",
-                analysis: "The Snyder Act reveals the gap between legal status and political agency. Citizenship remained a 'paper' right for many until long after the 19th Amendment, capitalizing on infrastructure disparities and state-level exclusion.",
-                modern: "Suppressive barriers continue through postal address requirements on reservations and bans on ballot collection. Tribes continue to fight in court to protect their political representation a century later."
+                secondary: "A century after the passage of the Snyder Act, Native American communities continue to battle deeply entrenched, systemic barriers to the electoral process, including unequal access to early voting sites, the lack of residential mail delivery on remote reservations, and severe socioeconomic deprivation.",
+                analysis: "The Snyder Act reveals the deep discrepancies between federal citizenship and functional, state level enfranchisement. Citizenship remained a paper right for many, capitalizing on infrastructure disparities and state level exclusion to maintain entrenched political power.",
+                modern: "The most pressing modern day ramification is currently playing out in the federal judiciary in the case of Turtle Mountain Band of Chippewa Indians v. Howe. The Eighth Circuit Court of Appeals ruled in 2023 that Section 2 of the Voting Rights Act does not provide a private right of action, stripping private citizens and tribes of their primary defense against state level disenfranchisement."
             }
         ];
 
@@ -270,17 +437,13 @@
             renderNav();
         }
 
-        function scrollNav(amt) {
-            document.getElementById('navContainer').scrollBy({ left: amt, behavior: 'smooth' });
-        }
-
         function renderNav() {
             const container = document.getElementById('navContainer');
             container.innerHTML = sections.map((s, i) => `
-                <button onclick="loadSection(${i})" class="nav-item p-4 flex flex-col items-center justify-center border-r border-[#a35c27]/10 focus:outline-none" id="nav-${i}">
-                    <div class="w-full aspect-video mb-3 img-placeholder rounded-sm shadow-xl" style="background-image: url('${s.img}');"></div>
-                    <span class="text-[12px] uppercase tracking-widest text-[#1a0f0a] mb-1">${s.year}</span>
-                    <span class="text-[10px] text-[#4a2c1d] truncate w-full text-center px-2">${s.title}</span>
+                <button onclick="loadSection(${i})" class="nav-item flex flex-col items-center justify-center focus:outline-none" id="nav-${i}">
+                    <div class="w-full aspect-video mb-2 img-placeholder rounded-sm shadow-md" style="background-image: url('${s.img}'); border: 1px solid rgba(255,255,255,0.2);"></div>
+                    <span class="font-bold text-[#ffb077] mb-1" style="font-size: 1.8rem;">${s.year}</span>
+                    <span class="truncate w-full text-center px-1 text-[#ffb077] font-bold" style="font-size: 1.2rem;">${s.title}</span>
                 </button>
             `).join('');
         }
@@ -292,26 +455,29 @@
 
             const main = document.getElementById('mainDisplay');
             main.innerHTML = `
-                <div class="fade-in max-w-4xl mx-auto glass-panel p-10 md:p-20 shadow-2xl rounded-sm report-view">
-                    <h2>${s.year}: ${s.title}</h2>
+                <div class="fade-in max-w-4xl mx-auto glass-panel p-8 md:p-14 shadow-2xl rounded-sm report-view">
+                    <h2 class="mb-8">${s.year}: ${s.title}</h2>
                     
-                    <div class="image-overlay-container aspect-video mb-6 border border-[#a35c27]/20">
+                    <div class="image-overlay-container aspect-video mb-8 border border-white/20">
                         <div class="img-placeholder" style="background-image: url('${s.img}');"></div>
                     </div>
 
                     <h4>Event Summary</h4>
-                    <p class="mb-12 text-[#1a0f0a] text-lg leading-relaxed">${s.summary}</p>
+                    <p class="mb-12 leading-relaxed text-3xl">${s.summary}</p>
 
                     <h4>Portrait</h4>
-                    <div class="image-overlay-container w-full md:w-96 aspect-square mb-6 border border-[#a35c27]/20">
-                        <div class="img-placeholder bg-stone-800/40 text-stone-400 flex items-center justify-center text-[10px] uppercase">[Portrait Placeholder]</div>
+                    <div class="image-overlay-container w-full aspect-video mx-auto mb-6 border border-white/20">
+                        ${s.portrait 
+                            ? `<div class="img-placeholder" style="background-image: url('${s.portrait}');"></div>` 
+                            : `<div class="img-placeholder bg-stone-800/40 text-white flex items-center justify-center text-[10px] uppercase" style="-webkit-text-stroke: 0; text-shadow: none; font-family: 'EB Garamond', serif;">[Portrait Placeholder]</div>`
+                        }
                     </div>
 
                     <h4>Bio</h4>
-                    <p class="mb-12 text-[#1a0f0a] text-lg leading-relaxed">${s.bio}</p>
+                    <p class="mb-12 leading-relaxed text-3xl">${s.bio}</p>
 
                     <h4>Detailed Event Description</h4>
-                    <p class="mb-12 leading-relaxed text-[#1a0f0a] text-xl">${s.detailed}</p>
+                    <p class="mb-12 leading-relaxed text-3xl">${s.detailed}</p>
 
                     <h4>Primary Sources</h4>
                     <div class="mb-12">
@@ -323,19 +489,30 @@
                                 ${s.primary.map(p => `<tr><td>${p.desc}</td><td>${p.coll}</td><td>${p.id}</td></tr>`).join('')}
                             </tbody>
                         </table>
+                        ${s.primaryImages ? `
+                        <div class="flex flex-wrap gap-6 mt-8">
+                            ${s.primaryImages.map(img => `<img src="${img}" class="h-48 aspect-video object-cover cursor-pointer border border-white/20 shadow-md hover:scale-105 hover:border-[#ffb077] transition-all duration-300 rounded-sm" onclick="openLightbox('${img}')">`).join('')}
+                        </div>
+                        ` : ''}
                     </div>
 
                     <h4>Secondary Sources</h4>
-                    <p class="mb-12 leading-relaxed text-[#1a0f0a] text-lg">${s.secondary}</p>
+                    <p class="mb-12 leading-relaxed text-3xl">${s.secondary}</p>
 
                     <h4>Analysis</h4>
-                    <p class="mb-16 leading-relaxed text-[#1a0f0a] text-lg">${s.analysis}</p>
+                    <p class="mb-16 leading-relaxed text-3xl">${s.analysis}</p>
+
+                    ${s.featuredImage ? `
+                    <div class="image-overlay-container aspect-video mb-16 border border-white/20">
+                        <div class="img-placeholder" style="background-image: url('${s.featuredImage}');"></div>
+                    </div>
+                    ` : ''}
 
                     ${s.chart ? `<div class="chart-container"><canvas id="legacyChart"></canvas></div>` : ''}
 
                     <hr>
-                    <h4>Modern-Day Ramifications</h4>
-                    <p class="mb-10 leading-relaxed text-[#1a0f0a] text-xl">${s.modern}</p>
+                    <h4>Modern Day Ramifications</h4>
+                    <p class="mb-12 leading-relaxed text-3xl">${s.modern}</p>
                 </div>
             `;
 
@@ -349,28 +526,46 @@
             if (!ctx) return;
             if (currentChart) currentChart.destroy();
             
-            Chart.defaults.color = '#1a0f0a';
-            Chart.defaults.font.family = 'sans-serif';
+            Chart.defaults.color = '#ffffff';
+            Chart.defaults.font.family = 'EB Garamond';
             
             currentChart = new Chart(ctx, {
                 type: cfg.type,
                 data: {
                     labels: cfg.labels,
-                    datasets: [{ data: cfg.data, backgroundColor: ['#d9c5b2', '#a35c27'], borderWidth: 0 }]
+                    datasets: [{ 
+                        data: cfg.data, 
+                        backgroundColor: ['#d9c5b2', '#a35c27'], 
+                        borderWidth: 1,
+                        borderColor: '#000000'
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { 
                         legend: { display: false }, 
-                        title: { display: true, text: cfg.title, color: '#1a0f0a', font: { size: 18 } } 
+                        title: { display: true, text: cfg.title, color: '#ffffff', font: { size: 22 } } 
                     },
                     scales: { 
-                        y: { beginAtZero: true, grid: { color: 'rgba(163, 92, 39, 0.1)' } }
+                        y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.2)' } }
                     }
                 }
             });
         }
+
+        function openLightbox(src) {
+            document.getElementById('lightboxImage').src = src;
+            document.getElementById('lightboxModal').classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightboxModal').classList.add('hidden');
+            document.getElementById('lightboxImage').src = '';
+        }
+
+        document.getElementById('aboutBtn').onclick = () => document.getElementById('aboutModal').classList.remove('hidden');
+        document.getElementById('closeAbout').onclick = () => document.getElementById('aboutModal').classList.add('hidden');
 
         init();
     </script>
