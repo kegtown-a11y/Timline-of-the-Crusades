@@ -491,7 +491,7 @@
                         </table>
                         ${s.primaryImages ? `
                         <div class="flex flex-wrap gap-6 mt-8">
-                            ${s.primaryImages.map(img => `<img src="${img}" class="h-48 aspect-video object-cover cursor-pointer border border-white/20 shadow-md hover:scale-105 hover:border-[#ffb077] transition-all duration-300 rounded-sm" onclick="openLightbox('${img}')">`).join('')}
+                            ${s.primaryImages.map(img => `<img src="${img}" class="h-48 aspect-[9/16] object-cover cursor-pointer border border-white/20 shadow-md hover:scale-105 hover:border-[#ffb077] transition-all duration-300 rounded-sm" onclick="openLightbox('${img}')">`).join('')}
                         </div>
                         ` : ''}
                     </div>
